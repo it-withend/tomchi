@@ -1,11 +1,19 @@
 import { regions, type Region } from '../data/regions';
 import { crops, methodEfficiency, type Crop, type Method, type StageKey } from '../data/crops';
 
+export type Soil = 'sandy' | 'loam' | 'clay';
+
+// sandy soils hold less water -> water more often; clay holds more -> less often
+export const soilIntervalFactor: Record<Soil, number> = { sandy: 0.75, loam: 1, clay: 1.25 };
+
 export interface FieldConfig {
+  id: string;
   regionId: string;
   cropId: string;
   areaHa: number;
   method: Method;
+  soil: Soil;
+  lastWatered?: string; // ISO date of last watering or rain event
 }
 
 export interface DayStatus {
@@ -99,7 +107,7 @@ export function dayStatus(cfg: FieldConfig, date = new Date()): DayStatus {
   const eff = methodEfficiency[cfg.method];
   const grossMm = etc / eff;
   const litersPerDay = grossMm * LITERS_PER_MM_HA * cfg.areaHa;
-  const intervalDays = crop.interval[key][cfg.method];
+  const intervalDays = Math.max(1, Math.round(crop.interval[key][cfg.method] * soilIntervalFactor[cfg.soil]));
   return {
     inSeason: true, stage: key, kc, et0, etc, grossMm,
     litersPerDay, intervalDays,
@@ -153,6 +161,35 @@ export function seasonTotals(cfg: FieldConfig) {
   const dripCal = seasonCalendar({ ...cfg, method: 'drip' });
   const m3Drip = dripCal.reduce((s, r) => s + r.m3Field, 0);
   return { m3Field, m3Furrow, m3Drip, m3Saved: Math.max(0, m3Furrow - m3Field) };
+}
+
+/** Next watering date and days remaining, based on the journal. */
+export function nextWatering(cfg: FieldConfig, today = new Date()): { date: Date; daysLeft: number; overdue: boolean } | null {
+  const s = dayStatus(cfg, today);
+  if (!s.inSeason) return null;
+  const base = cfg.lastWatered ? new Date(cfg.lastWatered) : today;
+  const next = new Date(base);
+  next.setDate(next.getDate() + (cfg.lastWatered ? s.intervalDays : 0));
+  const t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const n0 = new Date(next.getFullYear(), next.getMonth(), next.getDate());
+  const daysLeft = Math.round((n0.getTime() - t0.getTime()) / 86400000);
+  return { date: next, daysLeft, overdue: daysLeft < 0 };
+}
+
+/** Concrete upcoming watering dates for the calendar (walks stages forward). */
+export function upcomingWaterings(cfg: FieldConfig, count = 6, today = new Date()): Date[] {
+  const first = nextWatering(cfg, today);
+  if (!first) return [];
+  const out: Date[] = [];
+  let d = new Date(Math.max(first.date.getTime(), today.getTime()));
+  for (let i = 0; i < count; i++) {
+    const s = dayStatus(cfg, d);
+    if (!s.inSeason) break;
+    out.push(new Date(d));
+    d = new Date(d);
+    d.setDate(d.getDate() + s.intervalDays);
+  }
+  return out;
 }
 
 // Approximate cost of delivered irrigation water (pumping + service), som/m3

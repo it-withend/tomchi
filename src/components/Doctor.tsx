@@ -26,7 +26,16 @@ export function Doctor({ field }: { field: FieldConfig }) {
           </div>
           <div className="mt-3 rounded-3xl border border-line bg-card p-5">
             <p className="text-xs font-medium uppercase tracking-wide text-water-deep">{t('treatment', lang)}</p>
-            <p className="mt-1.5 leading-relaxed">{node.result.treatment[lang]}</p>
+            <ol className="mt-2 flex flex-col gap-2.5">
+              {node.result.treatment[lang].split(/(?<=[.!])\s+/).filter(Boolean).map((step, i) => (
+                <li key={i} className="flex gap-3 leading-relaxed">
+                  <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-water/10 text-xs font-bold text-water-deep">
+                    {i + 1}
+                  </span>
+                  {step}
+                </li>
+              ))}
+            </ol>
           </div>
           <div className="mt-3 rounded-3xl border border-leaf/30 bg-leaf-soft p-5">
             <p className="text-xs font-medium uppercase tracking-wide text-leaf">{t('prevention', lang)}</p>

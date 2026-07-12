@@ -103,6 +103,48 @@ export const dict: Dict = {
   alreadyBest: { uz: 'Siz eng tejamkor usuldan foydalanmoqdasiz — barakalla!', ru: 'Вы используете самый экономный способ — отлично!' },
   yourMethod: { uz: 'Sizning usulingiz', ru: 'Ваш способ' },
   efficiency: { uz: 'samaradorlik', ru: 'КПД' },
+  // Soil
+  stepSoil: { uz: 'Tuproq turi', ru: 'Тип почвы' },
+  soil_sandy: { uz: 'Qumloq', ru: 'Песчаная' },
+  soil_sandyDesc: { uz: 'Suv tez singadi — tez-tez sug‘oriladi', ru: 'Вода быстро уходит — поливать чаще' },
+  soil_loam: { uz: 'O‘rtacha (bo‘z tuproq)', ru: 'Средняя (суглинок)' },
+  soil_loamDesc: { uz: 'Ko‘pchilik dalalar uchun odatiy', ru: 'Обычная для большинства полей' },
+  soil_clay: { uz: 'Loyli (og‘ir)', ru: 'Глинистая (тяжёлая)' },
+  soil_clayDesc: { uz: 'Suvni uzoq saqlaydi — kamroq sug‘oriladi', ru: 'Долго держит воду — поливать реже' },
+  // Journal
+  iWatered: { uz: 'Sug‘ordim ✓', ru: 'Полил ✓' },
+  itRained: { uz: 'Yomg‘ir yog‘di 🌧', ru: 'Был дождь 🌧' },
+  daysToWatering: { uz: 'Sug‘orishgacha', ru: 'До полива' },
+  daysShort: { uz: 'kun', ru: 'дн.' },
+  waterToday: { uz: 'Bugun sug‘oring!', ru: 'Поливайте сегодня!' },
+  overdue: { uz: 'Sug‘orish kechikdi — bugun sug‘oring', ru: 'Полив просрочен — полейте сегодня' },
+  notWateredYet: { uz: 'Sug‘organingizni belgilang — eslatib turamiz', ru: 'Отмечайте поливы — мы напомним о следующем' },
+  lastWatered: { uz: 'Oxirgi sug‘orish', ru: 'Последний полив' },
+  rainNote: { uz: 'Yomg‘ir sug‘orish o‘rniga o‘tadi', ru: 'Дождь засчитывается как полив' },
+  // Fields
+  addField: { uz: '+ Dala qo‘shish', ru: '+ Добавить поле' },
+  deleteField: { uz: 'Dalani o‘chirish', ru: 'Удалить поле' },
+  cancel: { uz: 'Bekor qilish', ru: 'Отмена' },
+  // Calendar extras
+  upcoming: { uz: 'Yaqin sug‘orishlar', ru: 'Ближайшие поливы' },
+  wateringsCount: { uz: 'sug‘orish', ru: 'поливов' },
+  today: { uz: 'Bugun', ru: 'Сегодня' },
+  tomorrow: { uz: 'Ertaga', ru: 'Завтра' },
+  monthDetail: { uz: 'Oyni tanlab, batafsil ko‘ring', ru: 'Нажмите на месяц — покажем детали' },
+  perMonth: { uz: 'oyiga', ru: 'в месяц' },
+  intervalLabel: { uz: 'Sug‘orish oralig‘i', ru: 'Интервал полива' },
+  // Tutorial
+  tutSkip: { uz: 'O‘tkazib yuborish', ru: 'Пропустить' },
+  tutDone: { uz: 'Tushunarli!', ru: 'Понятно!' },
+  tut1Title: { uz: 'Bugun — suv me’yori', ru: 'Сегодня — норма воды' },
+  tut1Body: { uz: 'Katta tomchi dalangizga bugun qancha suv kerakligini ko‘rsatadi. «Sug‘ordim» tugmasini bosing — keyingi sug‘orishni eslatamiz.', ru: 'Большая капля показывает, сколько воды нужно вашему полю сегодня. Нажимайте «Полил» — напомним о следующем поливе.' },
+  tut2Title: { uz: 'Taqvim — mavsum rejasi', ru: 'Календарь — план сезона' },
+  tut2Body: { uz: 'Qaysi oyda qancha suv ketishini va yaqin sug‘orish kunlarini ko‘rasiz.', ru: 'Видно, сколько воды уйдёт в каждом месяце, и даты ближайших поливов.' },
+  tut3Title: { uz: 'Tashxis — o‘simlik shifokori', ru: 'Диагноз — доктор растений' },
+  tut3Body: { uz: 'Ekiningiz kasal bo‘lsa — belgilarni tanlang, kasallikni aniqlab davosini aytamiz.', ru: 'Если растение заболело — выберите признаки, определим болезнь и подскажем лечение.' },
+  tut4Title: { uz: 'Tejamkorlik — hisobingiz', ru: 'Экономия — ваш счёт' },
+  tut4Body: { uz: 'Qancha suv va pul tejayotganingizni ko‘rsatamiz. Suv — oltin!', ru: 'Показываем, сколько воды и денег вы экономите. Вода — золото!' },
+  help: { uz: 'Yordam', ru: 'Помощь' },
   // misc
   yes: { uz: 'Ha', ru: 'Да' },
   no: { uz: "Yo'q", ru: 'Нет' },
@@ -121,6 +163,16 @@ export function t(key: string, lang: Lang): string {
 export function fmt(s: string, ...args: (string | number)[]): string {
   let i = 0;
   return s.replace(/%[ds]/g, () => String(args[i++] ?? ''));
+}
+
+const monthShort: Record<Lang, string[]> = {
+  uz: ['yan', 'fev', 'mar', 'apr', 'may', 'iyn', 'iyl', 'avg', 'sen', 'okt', 'noy', 'dek'],
+  ru: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
+};
+
+// Intl lacks Uzbek month names in some browsers — format manually
+export function formatDate(d: Date, lang: Lang): string {
+  return `${d.getDate()} ${monthShort[lang][d.getMonth()]}`;
 }
 
 export function formatNum(n: number, lang: Lang): string {
