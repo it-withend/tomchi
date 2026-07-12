@@ -1,0 +1,65 @@
+@import '@fontsource/unbounded/500.css';
+@import '@fontsource/unbounded/700.css';
+@import '@fontsource/rubik/400.css';
+@import '@fontsource/rubik/500.css';
+@import '@fontsource/rubik/700.css';
+@import 'tailwindcss';
+
+@theme {
+  /* Rishtan ceramics: deep water blues on pale wash, leaf + clay accents */
+  --color-ink: #0c2e38;
+  --color-water: #0f7ba0;
+  --color-water-deep: #0a5570;
+  --color-water-dim: #6ba7bb;
+  --color-wash: #eef6f7;
+  --color-card: #ffffff;
+  --color-leaf: #3e8e5a;
+  --color-leaf-soft: #e3f1e8;
+  --color-clay: #c17a3a;
+  --color-clay-soft: #f7ecdf;
+  --color-line: #d5e5e9;
+
+  --font-display: 'Unbounded', system-ui, sans-serif;
+  --font-body: 'Rubik', system-ui, sans-serif;
+}
+
+html {
+  background: var(--color-wash);
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* --- signature: water fill inside the droplet gauge --- */
+@keyframes wave-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-200px); }
+}
+.wave {
+  animation: wave-drift 5s linear infinite;
+}
+.wave.slow {
+  animation-duration: 8s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .wave { animation: none; }
+}
+
+/* canal divider between sections */
+.canal {
+  height: 10px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='10' viewBox='0 0 40 10'%3E%3Cpath d='M0 5 Q10 0 20 5 T40 5' fill='none' stroke='%23d5e5e9' stroke-width='1.6'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+}
+
+button:focus-visible, a:focus-visible, input:focus-visible {
+  outline: 2px solid var(--color-water);
+  outline-offset: 2px;
+}
