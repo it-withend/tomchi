@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useApp } from './state';
 import { t } from './i18n';
 import { Onboarding } from './components/Onboarding';
@@ -22,6 +22,10 @@ export default function App() {
   const [tab, setTab] = useState<Tab>('today');
   const [showHelp, setShowHelp] = useState(false);
 
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
+
   if (!activeField || adding) return <div className="mx-auto max-w-md"><Onboarding key={adding ? 'add' : 'first'} /></div>;
 
   const tutorialOpen = !tutorialSeen || showHelp;
@@ -30,9 +34,10 @@ export default function App() {
     <div className="mx-auto min-h-dvh max-w-md">
       {/* top bar */}
       <header className="flex items-center justify-between px-5 pt-5">
-        <p className="font-display text-lg font-bold text-water-deep">
+        <p className="flex items-center gap-2 font-display text-lg font-bold text-water-deep">
+          <img src="/logo.svg" alt="" className="h-7 w-7 rounded-lg" aria-hidden />
           {t('appName', lang)}
-          <span className="ml-2 align-middle font-body text-[11px] font-normal tracking-wide text-clay">
+          <span className="align-middle font-body text-[11px] font-normal tracking-wide text-clay">
             {t('tagline', lang)}
           </span>
         </p>
@@ -55,7 +60,7 @@ export default function App() {
       <main>
         {tab === 'today' && <Dashboard field={activeField} />}
         {tab === 'calendar' && <CalendarView field={activeField} />}
-        {tab === 'doctor' && <Doctor field={activeField} />}
+        {tab === 'doctor' && <Doctor key={activeField.id + activeField.cropId} field={activeField} />}
         {tab === 'impact' && <Impact field={activeField} />}
       </main>
 

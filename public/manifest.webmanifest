@@ -1,0 +1,12 @@
+{
+  "name": "Tomchi — aqlli sug'orish yordamchisi",
+  "short_name": "Tomchi",
+  "description": "Har bir tomchi hisobda. FAO-56 asosida sug'orish me'yori, kasallik tashxisi va suv tejash.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#eef6f7",
+  "theme_color": "#0a5570",
+  "icons": [
+    { "src": "/logo.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

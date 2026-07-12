@@ -135,15 +135,37 @@ export const dict: Dict = {
   intervalLabel: { uz: 'Sug‘orish oralig‘i', ru: 'Интервал полива' },
   // Tutorial
   tutSkip: { uz: 'O‘tkazib yuborish', ru: 'Пропустить' },
-  tutDone: { uz: 'Tushunarli!', ru: 'Понятно!' },
-  tut1Title: { uz: 'Bugun — suv me’yori', ru: 'Сегодня — норма воды' },
-  tut1Body: { uz: 'Katta tomchi dalangizga bugun qancha suv kerakligini ko‘rsatadi. «Sug‘ordim» tugmasini bosing — keyingi sug‘orishni eslatamiz.', ru: 'Большая капля показывает, сколько воды нужно вашему полю сегодня. Нажимайте «Полил» — напомним о следующем поливе.' },
-  tut2Title: { uz: 'Taqvim — mavsum rejasi', ru: 'Календарь — план сезона' },
-  tut2Body: { uz: 'Qaysi oyda qancha suv ketishini va yaqin sug‘orish kunlarini ko‘rasiz.', ru: 'Видно, сколько воды уйдёт в каждом месяце, и даты ближайших поливов.' },
-  tut3Title: { uz: 'Tashxis — o‘simlik shifokori', ru: 'Диагноз — доктор растений' },
-  tut3Body: { uz: 'Ekiningiz kasal bo‘lsa — belgilarni tanlang, kasallikni aniqlab davosini aytamiz.', ru: 'Если растение заболело — выберите признаки, определим болезнь и подскажем лечение.' },
-  tut4Title: { uz: 'Tejamkorlik — hisobingiz', ru: 'Экономия — ваш счёт' },
-  tut4Body: { uz: 'Qancha suv va pul tejayotganingizni ko‘rsatamiz. Suv — oltin!', ru: 'Показываем, сколько воды и денег вы экономите. Вода — золото!' },
+  tutDone: { uz: 'Tushunarli, boshladik!', ru: 'Понятно, начнём!' },
+  tut1Title: { uz: 'Xush kelibsiz, dehqon aka!', ru: 'Добро пожаловать, фермер!' },
+  tut1Body: {
+    uz: 'Tomchi — cho‘ntagingizdagi agronom. U dalangiz uchun qancha suv kerakligini ilmiy hisoblab beradi, kasalliklarni aniqlaydi va suvni tejashga yordam beradi. Hammasi bepul va internetsiz ham ishlaydi. Keling, 1 daqiqada hammasini ko‘rsatamiz.',
+    ru: 'Томчи — агроном в вашем кармане. Он по науке считает, сколько воды нужно вашему полю, определяет болезни растений и помогает экономить воду. Всё бесплатно и работает даже без интернета. Давайте за 1 минуту всё покажем.',
+  },
+  tut2Title: { uz: '💧 «Bugun» — kunlik suv me’yori', ru: '💧 «Сегодня» — норма воды на день' },
+  tut2Body: {
+    uz: 'Katta tomchi ichidagi suv — bugungi me’yor. Raqam — dalangizga bugun kerak bo‘lgan suv (litr yoki m³). Sug‘organingizda «Sug‘ordim ✓» tugmasini bosing — keyingi sug‘orishgacha necha kun qolganini ko‘rsatamiz. Yomg‘ir yog‘sa — «Yomg‘ir yog‘di» tugmasini bosing, u sug‘orish o‘rniga o‘tadi.',
+    ru: 'Вода внутри большой капли — сегодняшняя норма. Цифра — сколько воды нужно вашему полю сегодня (в литрах или м³). Полили — нажмите «Полил ✓», и мы покажем, сколько дней до следующего полива. Прошёл дождь — нажмите «Был дождь», он засчитается вместо полива.',
+  },
+  tut3Title: { uz: '🌾 Bir nechta dala', ru: '🌾 Несколько полей' },
+  tut3Body: {
+    uz: 'Yuqoridagi tugmalar — dalalaringiz. Har biri uchun alohida hisob: boshqa ekin, boshqa tuproq, boshqa me’yor. «+ Dala qo‘shish» bilan istalgancha dala kiritishingiz mumkin.',
+    ru: 'Кнопки сверху — ваши поля. Для каждого свой расчёт: другая культура, другая почва, другая норма. Через «+ Добавить поле» можно завести сколько угодно полей.',
+  },
+  tut4Title: { uz: '📅 «Taqvim» — mavsum rejasi', ru: '📅 «Календарь» — план сезона' },
+  tut4Body: {
+    uz: 'Yaqin sug‘orish kunlari aniq sanalar bilan: qachon va qancha suv. Pastda — butun mavsum bo‘yicha oylik jadval: qaysi oyda suv ko‘p ketadi, mavsumda jami qancha kerak. Ekish va hosilni rejalashtirishga qulay.',
+    ru: 'Ближайшие поливы с точными датами: когда и сколько воды. Ниже — график по месяцам на весь сезон: в каком месяце воды уйдёт больше всего и сколько всего нужно за сезон. Удобно планировать посевную и урожай.',
+  },
+  tut5Title: { uz: '🩺 «Tashxis» — o‘simlik shifokori', ru: '🩺 «Диагноз» — доктор растений' },
+  tut5Body: {
+    uz: 'Ekiningizda dog‘, so‘lish yoki hasharot ko‘rdingizmi? Belgilarni tanlang — kasallik yoki zararkunandani aniqlab, davolashni bosqichma-bosqich aytamiz: nima sepish, qachon va qanday oldini olish.',
+    ru: 'Заметили пятна, увядание или насекомых? Выберите признаки — определим болезнь или вредителя и дадим пошаговое лечение: чем обработать, когда, и как не допустить повторения.',
+  },
+  tut6Title: { uz: '🌊 «Tejamkorlik» — sizning foydangiz', ru: '🌊 «Экономия» — ваша выгода' },
+  tut6Body: {
+    uz: 'Ilova bo‘yicha sug‘orsangiz, mavsumda qancha suv va pul tejashingizni ko‘rasiz. Suvni tejash — Orol uchun ham, cho‘ntagingiz uchun ham foyda. Savollar bo‘lsa — yuqoridagi «?» tugmasini bosing, bu qo‘llanma qayta ochiladi.',
+    ru: 'Поливая по приложению, вы видите, сколько воды и денег сэкономите за сезон. Экономия воды — польза и для Арала, и для вашего кармана. Появятся вопросы — нажмите «?» сверху, эта инструкция откроется снова.',
+  },
   help: { uz: 'Yordam', ru: 'Помощь' },
   // misc
   yes: { uz: 'Ha', ru: 'Да' },

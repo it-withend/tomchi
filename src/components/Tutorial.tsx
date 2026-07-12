@@ -1,12 +1,14 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useApp } from '../state';
 import { t } from '../i18n';
 
 const slides = [
-  { icon: '💧', titleKey: 'tut1Title', bodyKey: 'tut1Body' },
-  { icon: '📅', titleKey: 'tut2Title', bodyKey: 'tut2Body' },
-  { icon: '🩺', titleKey: 'tut3Title', bodyKey: 'tut3Body' },
-  { icon: '🌊', titleKey: 'tut4Title', bodyKey: 'tut4Body' },
+  { icon: '🧑‍🌾', titleKey: 'tut1Title', bodyKey: 'tut1Body' },
+  { icon: '💧', titleKey: 'tut2Title', bodyKey: 'tut2Body' },
+  { icon: '🌾', titleKey: 'tut3Title', bodyKey: 'tut3Body' },
+  { icon: '📅', titleKey: 'tut4Title', bodyKey: 'tut4Body' },
+  { icon: '🩺', titleKey: 'tut5Title', bodyKey: 'tut5Body' },
+  { icon: '🌊', titleKey: 'tut6Title', bodyKey: 'tut6Body' },
 ];
 
 export function Tutorial({ onClose }: { onClose: () => void }) {
@@ -14,6 +16,12 @@ export function Tutorial({ onClose }: { onClose: () => void }) {
   const [i, setI] = useState(0);
   const s = slides[i];
   const last = i === slides.length - 1;
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
 
   return (
     <div className="fixed inset-0 z-30 flex items-end justify-center bg-ink/60 backdrop-blur-sm"

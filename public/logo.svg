@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Tomchi logo: a drop of water falling onto a sprout between green hills -->
+  <rect width="512" height="512" rx="118" fill="#f5f2e8"/>
+  <g fill="none" stroke="#3d8fc4" stroke-width="14" stroke-linecap="round" stroke-dasharray="26 24">
+    <path d="M118 214 Q152 126 242 104"/>
+    <path d="M394 214 Q360 126 270 104"/>
+    <path d="M84 258 Q110 174 188 136"/>
+    <path d="M428 258 Q402 174 324 136"/>
+  </g>
+  <path d="M256 126 C256 126 214 182 214 214 a42 42 0 0 0 84 0 C298 182 256 126 256 126 Z" fill="#3d8fc4"/>
+  <!-- sprout -->
+  <path d="M256 262 L256 368" stroke="#4d9e46" stroke-width="16" stroke-linecap="round"/>
+  <path d="M252 316 C216 312 188 286 184 250 C222 254 250 280 252 316 Z" fill="#5cb04f"/>
+  <path d="M260 316 C296 312 324 286 328 250 C290 254 262 280 260 316 Z" fill="#4d9e46"/>
+  <path d="M252 272 C230 268 214 252 212 230 C234 234 250 250 252 272 Z" fill="#6cbf5a"/>
+  <path d="M260 272 C282 268 298 252 300 230 C278 234 262 250 260 272 Z" fill="#5cb04f"/>
+  <!-- hills: dark left, light right, separated by a cream stripe -->
+  <path d="M0 408 Q140 348 300 380 L300 512 L0 512 Z" fill="#2f7a3a"/>
+  <path d="M512 388 Q340 348 180 430 L180 512 L512 512 Z" fill="#7cb342"/>
+  <path d="M300 372 Q322 434 296 512 L252 512 Q280 430 258 376 Z" fill="#f5f2e8"/>
+</svg>

@@ -64,11 +64,7 @@ export function Onboarding() {
           ))}
         </div>
         <div>
-          <svg viewBox="0 0 80 100" className="mb-6 h-24 w-auto" aria-hidden>
-            <path d="M40 4 C40 4 12 42 12 64 a28 28 0 0 0 56 0 C68 42 40 4 40 4 Z" fill="#0f7ba0" />
-            <path d="M40 22 C40 22 22 48 22 63 a18 18 0 0 0 36 0 C58 48 40 22 40 22 Z" fill="#7fc3dc" />
-            <circle cx="33" cy="66" r="5" fill="#ffffff" opacity="0.9" />
-          </svg>
+          <img src="/logo.svg" alt="" className="mb-6 h-28 w-28 rounded-3xl shadow-md" aria-hidden />
           <h1 className="font-display text-4xl font-bold leading-tight text-water-deep">{t('appName', lang)}</h1>
           <p className="mt-1 font-display text-sm text-clay">{t('tagline', lang)}</p>
           <h2 className="mt-6 text-2xl font-bold leading-snug">{t('welcomeTitle', lang)}</h2>

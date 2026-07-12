@@ -25,11 +25,12 @@ export function DropGauge({ fill, label }: { fill: number; label: string }) {
         <g clipPath="url(#dropClip)">
           <g style={{ transform: `translateY(${level - H}px)`, transition: 'transform 1.2s cubic-bezier(.3,.7,.3,1)' }}>
             {/* two drifting wave layers + body of water, tall enough to cover the drop */}
+            {/* wave sheets span -200..600 so a -200px drift never uncovers the 0..160 viewbox */}
             <g className="wave slow">
-              <path d={`M-200 ${H} q25 -14 50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 V${H + 260} H-200 Z`} fill="#7fc3dc" opacity="0.7" />
+              <path d={`M-200 ${H} q25 -14 50 0 ${'t50 0 '.repeat(15)} V${H + 260} H-200 Z`} fill="#7fc3dc" opacity="0.7" />
             </g>
             <g className="wave">
-              <path d={`M-200 ${H + 6} q25 -12 50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 V${H + 260} H-200 Z`} fill="url(#waterGrad)" />
+              <path d={`M-200 ${H + 6} q25 -12 50 0 ${'t50 0 '.repeat(15)} V${H + 260} H-200 Z`} fill="url(#waterGrad)" />
             </g>
           </g>
         </g>
