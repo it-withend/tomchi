@@ -1,24 +1,22 @@
-import { functionsUrl, anonKey, ensureSession, supabase } from './supabase';
 import type { Lang } from '../i18n';
 
-export const aiEnabled = !!functionsUrl;
+// AI doctor calls Netlify Functions (key stays server-side). Override the base
+// with VITE_AI_URL if you host the functions elsewhere.
+const base = (import.meta.env.VITE_AI_URL as string | undefined) ?? '/.netlify/functions';
 
-async function authHeader(): Promise<Record<string, string>> {
-  await ensureSession();
-  const { data } = (await supabase?.auth.getSession()) ?? { data: { session: null } };
-  const token = data.session?.access_token ?? anonKey ?? '';
-  return { Authorization: `Bearer ${token}`, apikey: anonKey ?? '' };
-}
+// Always show the AI tab; if functions aren't deployed yet the call surfaces a
+// friendly error rather than a "not configured" dead end.
+export const aiEnabled = true;
 
 async function callFn(fn: string, body: unknown): Promise<string> {
-  if (!functionsUrl) throw new Error('AI not configured');
-  const res = await fetch(`${functionsUrl}/${fn}`, {
+  const res = await fetch(`${base}/${fn}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
   if (!res.ok) throw new Error(`AI error ${res.status}`);
   const json = await res.json();
+  if (json.error) throw new Error(json.error);
   return json.answer as string;
 }
 

@@ -2,10 +2,10 @@ import 'dotenv/config';
 import cron from 'node-cron';
 import { getMe, sendMessage, editMessage, answerCallback, poll, type InlineButton } from './telegram';
 import * as store from './store';
-import { m, stageName, methodName, soilName } from './messages';
+import { m, stageName, methodName, soilName, monthShort } from './messages';
 import { regions } from '../src/data/regions';
 import { crops, type Crop } from '../src/data/crops';
-import { dayStatus, getCrop, type FieldConfig } from '../src/engine/irrigation';
+import { dayStatus, getCrop, getRegion, seasonCalendar, seasonTotals, SOM_PER_M3, type FieldConfig } from '../src/engine/irrigation';
 import { supaEnabled, linkChat, isLinked, fieldsForChat, subscribedChats, setSubscribed } from './supa';
 
 type Lang = store.Lang;
@@ -46,11 +46,18 @@ async function rainSoon(regionId: string): Promise<boolean> {
 
 function fieldBlock(field: FieldConfig, lang: Lang, withHeader: boolean): string | null {
   const st = dayStatus(field);
-  if (!st.inSeason) return null;
   const crop: Crop = getCrop(field.cropId);
+  const region = getRegion(field.regionId);
+  const header = withHeader
+    ? m('fieldHeader', lang, { crop: crop.name[lang], area: field.areaHa, region: region.name[lang] })
+    : null;
+  if (!st.inSeason) {
+    // Show the field but say it's out of season (don't hide it entirely).
+    return [header, m('offSeason', lang)].filter(Boolean).join('\n');
+  }
   const m3 = Math.round(st.litersPerDay / 100) / 10;
   const lines: string[] = [];
-  if (withHeader) lines.push(m('fieldHeader', lang, { crop: crop.name[lang], area: field.areaHa }));
+  if (header) lines.push(header);
   lines.push(
     m('waterLine', lang, { v: m3, mm: Math.round(st.grossMm * 10) / 10 }),
     m('stageLine', lang, { s: stageName[st.stage]?.[lang] ?? st.stage }),
@@ -59,13 +66,58 @@ function fieldBlock(field: FieldConfig, lang: Lang, withHeader: boolean): string
   return lines.join('\n');
 }
 
-/** Combined daily message for one or more fields. */
+/** Combined daily message for one or more fields. Null only when there are none. */
 function dailyMessage(fields: FieldConfig[], lang: Lang, rain: boolean): string | null {
+  if (!fields.length) return null;
   const blocks = fields.map((f) => fieldBlock(f, lang, fields.length > 1)).filter(Boolean) as string[];
-  if (!blocks.length) return null;
   const out = [m('dailyHeader', lang), '', blocks.join('\n\n')];
   if (rain) out.push('\n' + m('rainSkip', lang));
   return out.join('\n');
+}
+
+function calendarText(fields: FieldConfig[], lang: Lang): string {
+  const parts: string[] = [m('calendarHeader', lang)];
+  for (const f of fields) {
+    const crop = getCrop(f.cropId);
+    const region = getRegion(f.regionId);
+    const cal = seasonCalendar(f);
+    const rows = cal
+      .filter((r) => r.m3Field > 0)
+      .map((r) => `${monthShort[lang][r.month]}: ${Math.round(r.m3Field)} m³`)
+      .join('\n');
+    const total = cal.reduce((s, r) => s + r.m3Field, 0);
+    parts.push(
+      `\n${m('fieldHeader', lang, { crop: crop.name[lang], area: f.areaHa, region: region.name[lang] })}\n${rows || '—'}\n${m('calendarTotal', lang, { v: Math.round(total) })}`,
+    );
+  }
+  return parts.join('\n');
+}
+
+function savingsText(fields: FieldConfig[], lang: Lang): string {
+  const parts: string[] = [m('savingsHeader', lang)];
+  for (const f of fields) {
+    const crop = getCrop(f.cropId);
+    const tot = seasonTotals(f);
+    const method = m(f.method, lang);
+    const block = [`\n${crop.emoji} <b>${crop.name[lang]}</b>`];
+    if (f.method === 'drip') {
+      block.push(m('savingsWater', lang, { v: Math.round(tot.m3Saved), method }));
+      block.push(m('savingsMoney', lang, { v: Math.round(tot.m3Saved * SOM_PER_M3) }));
+      block.push(m('savingsBest', lang));
+    } else {
+      block.push(m('savingsWater', lang, { v: Math.round(tot.m3Saved), method }));
+      block.push(m('savingsMoney', lang, { v: Math.round(tot.m3Saved * SOM_PER_M3) }));
+    }
+    parts.push(block.join('\n'));
+  }
+  return parts.join('\n');
+}
+
+/** Resolve the fields for a chat: linked app fields take priority. */
+async function resolveFields(chatId: number, sub?: store.Subscriber): Promise<FieldConfig[]> {
+  if (await isLinked(chatId)) return fieldsForChat(chatId);
+  if (sub && sub.step === 'done') return [toField(sub)];
+  return [];
 }
 
 // ---- setup keyboards --------------------------------------------------------
@@ -86,6 +138,31 @@ function methodKb(lang: Lang) {
 }
 function soilKb(lang: Lang) {
   return grid((['sandy', 'loam', 'clay'] as const).map((k) => ({ text: soilName[k][lang], callback_data: `soil:${k}` })), 1);
+}
+
+function menuKb(lang: Lang): InlineButton[][] {
+  return [[
+    { text: lang === 'uz' ? '💧 Bugun' : '💧 Сегодня', callback_data: 'cmd:today' },
+    { text: lang === 'uz' ? '📅 Taqvim' : '📅 Календарь', callback_data: 'cmd:calendar' },
+    { text: lang === 'uz' ? '🌊 Tejamkorlik' : '🌊 Экономия', callback_data: 'cmd:savings' },
+  ]];
+}
+
+async function replyToday(chatId: number, lang: Lang, sub?: store.Subscriber) {
+  const fields = await resolveFields(chatId, sub);
+  if (!fields.length) { await sendMessage(chatId, m('noFields', lang)); return; }
+  const rain = await rainSoon(fields[0].regionId);
+  await sendMessage(chatId, dailyMessage(fields, lang, rain) ?? m('noFields', lang), menuKb(lang));
+}
+async function replyCalendar(chatId: number, lang: Lang, sub?: store.Subscriber) {
+  const fields = await resolveFields(chatId, sub);
+  if (!fields.length) { await sendMessage(chatId, m('noFields', lang)); return; }
+  await sendMessage(chatId, calendarText(fields, lang), menuKb(lang));
+}
+async function replySavings(chatId: number, lang: Lang, sub?: store.Subscriber) {
+  const fields = await resolveFields(chatId, sub);
+  if (!fields.length) { await sendMessage(chatId, m('noFields', lang)); return; }
+  await sendMessage(chatId, savingsText(fields, lang), menuKb(lang));
 }
 
 // ---- update handling --------------------------------------------------------
@@ -109,7 +186,8 @@ async function onMessage(msg: any) {
     const code = text.split(/\s+/)[1]?.trim();
     if (!code || !/^\d{6}$/.test(code)) { await sendMessage(chatId, m('linkUsage', lang)); return; }
     const ok = await linkChat(code, chatId, lang);
-    await sendMessage(chatId, m(ok ? 'linkOk' : 'linkFail', lang));
+    if (ok) { await sendMessage(chatId, m('linkOk', lang)); await replyToday(chatId, lang, sub); }
+    else await sendMessage(chatId, m('linkFail', lang));
     return;
   }
   if (text.startsWith('/stop')) {
@@ -118,21 +196,10 @@ async function onMessage(msg: any) {
     await sendMessage(chatId, m('stopped', lang));
     return;
   }
-  if (text.startsWith('/today')) {
-    // Prefer fields configured in the app (linked via code), else the bot's own setup.
-    if (await isLinked(chatId)) {
-      const fields = await fieldsForChat(chatId);
-      const rain = fields[0] ? await rainSoon(fields[0].regionId) : false;
-      const t = dailyMessage(fields, lang, rain);
-      await sendMessage(chatId, t ?? m('offSeason', lang));
-      return;
-    }
-    if (!sub || sub.step !== 'done') { await sendMessage(chatId, m('needSetup', lang)); return; }
-    const rain = await rainSoon(sub.regionId!);
-    const t = dailyMessage([toField(sub)], lang, rain);
-    await sendMessage(chatId, t ?? m('offSeason', lang));
-    return;
-  }
+  if (text.startsWith('/menu')) { await sendMessage(chatId, m('menu', lang), menuKb(lang)); return; }
+  if (text.startsWith('/today')) { await replyToday(chatId, lang, sub); return; }
+  if (text.startsWith('/calendar') || text.startsWith('/taqvim')) { await replyCalendar(chatId, lang, sub); return; }
+  if (text.startsWith('/savings') || text.startsWith('/tejamkorlik')) { await replySavings(chatId, lang, sub); return; }
   // any other text
   await sendMessage(chatId, m('help', lang));
 }
@@ -170,9 +237,13 @@ async function onCallback(cb: any) {
     case 'soil': {
       const done = store.upsert(chatId, { soil: value as store.Soil, step: 'done', subscribed: true });
       await editMessage(chatId, messageId, m('done', lang));
-      const rain = await rainSoon(done.regionId!);
-      const t = dailyMessage([toField(done)], lang, rain);
-      if (t) await sendMessage(chatId, t);
+      await replyToday(chatId, lang, done);
+      break;
+    }
+    case 'cmd': {
+      if (value === 'today') await replyToday(chatId, lang, sub);
+      else if (value === 'calendar') await replyCalendar(chatId, lang, sub);
+      else if (value === 'savings') await replySavings(chatId, lang, sub);
       break;
     }
   }

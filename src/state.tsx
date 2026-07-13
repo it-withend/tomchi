@@ -50,12 +50,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
+    let loadedFields: FieldConfig[] = [];
     try {
       const raw = localStorage.getItem(LS_KEY);
       if (raw) {
         const s = JSON.parse(raw);
         if (s.lang) setLang(s.lang);
-        if (Array.isArray(s.fields)) setFields(s.fields);
+        if (Array.isArray(s.fields)) { setFields(s.fields); loadedFields = s.fields; }
         if (s.activeFieldId) setActiveFieldId(s.activeFieldId);
         if (s.tutorialSeen) setTutorialSeen(true);
       } else {
@@ -63,12 +64,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
         if (v1) {
           if (v1.lang) setLang(v1.lang);
           setFields(v1.fields);
+          loadedFields = v1.fields;
           if (v1.fields[0]) setActiveFieldId(v1.fields[0].id);
         }
       }
     } catch { /* corrupted storage — start fresh */ }
     setLoaded(true);
-    if (supabaseEnabled) ensureSession(); // establish anon owner in the background
+    // Establish the anon owner, then push every existing field so a freshly
+    // linked bot sees fields created before sync was enabled.
+    if (supabaseEnabled) {
+      ensureSession().then((user) => {
+        if (user) loadedFields.forEach((f) => void pushField(f));
+      });
+    }
   }, []);
 
   useEffect(() => {

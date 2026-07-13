@@ -31,7 +31,26 @@ export const M: M = {
   linkOk: { uz: '✅ Ilova ulandi! Endi dalangiz ma’lumotlari shu yerda. /today ni bosing.', ru: '✅ Приложение подключено! Теперь данные вашего поля здесь. Нажмите /today.' },
   linkFail: { uz: '❌ Kod noto‘g‘ri yoki muddati o‘tgan. Ilovada yangi kod oling.', ru: '❌ Код неверный или истёк. Сгенерируйте новый код в приложении.' },
   linkHint: { uz: '\n\n📱 Ilovada dala yaratgan bo‘lsangiz, uni ulash uchun: /link kod', ru: '\n\n📱 Если вы создали поле в приложении, подключите его: /link код' },
-  fieldHeader: { uz: '🌱 <b>{crop}</b> ({area} ga)', ru: '🌱 <b>{crop}</b> ({area} га)' },
+  fieldHeader: { uz: '🌱 <b>{crop}</b> ({area} ga · {region})', ru: '🌱 <b>{crop}</b> ({area} га · {region})' },
+  noFields: {
+    uz: 'Sizda hali dala yo‘q. Ilovada dala yarating yoki /link kod bilan ulang.',
+    ru: 'У вас пока нет поля. Создайте поле в приложении или подключите через /link код.',
+  },
+  menu: {
+    uz: '📋 Buyruqlar:\n/today — bugungi suv me’yori\n/calendar — mavsumiy taqvim\n/savings — suv va pul tejamkorligi\n/stop — eslatmalarni o‘chirish',
+    ru: '📋 Команды:\n/today — норма воды на сегодня\n/calendar — сезонный календарь\n/savings — экономия воды и денег\n/stop — выключить напоминания',
+  },
+  calendarHeader: { uz: '📅 <b>Mavsumiy sug‘orish taqvimi</b>', ru: '📅 <b>Сезонный календарь полива</b>' },
+  calendarTotal: { uz: 'Mavsum jami: <b>{v} m³</b>', ru: 'Итого за сезон: <b>{v} m³</b>' },
+  savingsHeader: { uz: '🌊 <b>Sizning tejamkorligingiz</b>', ru: '🌊 <b>Ваша экономия</b>' },
+  savingsWater: { uz: '💧 Tejalgan suv: <b>{v} m³</b> ({method}, egatga nisbatan)', ru: '💧 Сэкономлено воды: <b>{v} m³</b> ({method}, против арычного)' },
+  savingsMoney: { uz: '💰 Tejalgan mablag‘: <b>{v} so‘m</b> / mavsum', ru: '💰 Сэкономлено денег: <b>{v} сум</b> / сезон' },
+  savingsBest: { uz: 'Siz eng tejamkor usuldan foydalanyapsiz — barakalla!', ru: 'Вы используете самый экономный способ — отлично!' },
+};
+
+export const monthShort: Record<string, string[]> = {
+  uz: ['Yan', 'Fev', 'Mar', 'Apr', 'May', 'Iyn', 'Iyl', 'Avg', 'Sen', 'Okt', 'Noy', 'Dek'],
+  ru: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
 };
 
 export function m(key: string, lang: Lang, vars: Record<string, string | number> = {}): string {
