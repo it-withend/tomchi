@@ -80,8 +80,8 @@ export default function App() {
           {tabs.map((tb) => (
             <button key={tb.id} onClick={() => setTab(tb.id)}
               aria-current={tab === tb.id ? 'page' : undefined}
-              className={`flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[11px] font-medium ${tab === tb.id ? 'text-water-deep' : 'text-ink/40'}`}>
-              <Icon name={tb.icon} size={22} strokeWidth={tab === tb.id ? 2 : 1.7} />
+              className={`flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[11px] font-medium ${tab === tb.id ? 'text-water' : 'text-ink/40'}`}>
+              <Icon name={tb.icon} size={23} strokeWidth={tab === tb.id ? 2.4 : 2} />
               {t(tb.labelKey, lang)}
             </button>
           ))}

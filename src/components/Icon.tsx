@@ -49,7 +49,7 @@ const P: Record<IconName, ReactNode> = {
 };
 
 export function Icon({
-  name, size = 20, className, strokeWidth = 1.8,
+  name, size = 20, className, strokeWidth = 2.15,
 }: { name: IconName; size?: number; className?: string; strokeWidth?: number }) {
   return (
     <svg

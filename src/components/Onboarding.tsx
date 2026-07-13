@@ -146,7 +146,7 @@ export function Onboarding() {
             {soils.map((s) => (
               <button key={s.id} onClick={() => { setSoil(s.id); setStep(5); }}
                 className={`flex items-center gap-4 rounded-2xl border p-4 text-left ${soil === s.id ? 'border-water bg-water/5 ring-2 ring-water' : 'border-line bg-card'}`}>
-                <Icon name={s.icon} size={30} className="shrink-0 text-water-deep" />
+                <Icon name={s.icon} size={30} className="shrink-0 text-water" />
                 <span>
                   <span className="block font-medium">{t(s.labelKey, lang)}</span>
                   <span className="block text-sm text-ink/60">{t(s.descKey, lang)}</span>
@@ -163,7 +163,7 @@ export function Onboarding() {
             {methods.map((m) => (
               <button key={m.id} onClick={() => setMethod(m.id)}
                 className={`flex items-center gap-4 rounded-2xl border p-4 text-left ${method === m.id ? 'border-water bg-water/5 ring-2 ring-water' : 'border-line bg-card'}`}>
-                <Icon name={m.icon} size={30} className="shrink-0 text-water-deep" />
+                <Icon name={m.icon} size={30} className="shrink-0 text-water" />
                 <span>
                   <span className="block font-medium">{t(m.labelKey, lang)}</span>
                   <span className="block text-sm text-ink/60">{t(m.descKey, lang)}</span>

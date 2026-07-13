@@ -3,6 +3,8 @@ import { t, fmt, formatNum } from '../i18n';
 import { seasonTotals, SOM_PER_M3, POOL_M3, type FieldConfig } from '../engine/irrigation';
 import { methodEfficiency } from '../data/crops';
 import { NationalImpact } from './NationalImpact';
+import { SubsidyCalculator } from './SubsidyCalculator';
+import { CropPrices } from './CropPrices';
 import { Icon } from './Icon';
 
 export function Impact({ field }: { field: FieldConfig }) {
@@ -69,6 +71,8 @@ export function Impact({ field }: { field: FieldConfig }) {
         <p className="text-sm leading-relaxed text-ink/70">{t('aralNote', lang)}</p>
       </div>
 
+      <SubsidyCalculator field={field} />
+      <CropPrices field={field} />
       <NationalImpact />
     </div>
   );

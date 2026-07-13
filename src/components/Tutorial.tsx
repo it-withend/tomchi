@@ -36,7 +36,7 @@ export function Tutorial({ onClose }: { onClose: () => void }) {
           </div>
           <button onClick={onClose} className="text-sm font-medium text-ink/50">{t('tutSkip', lang)}</button>
         </div>
-        <div className="mt-6 grid h-24 w-24 place-items-center rounded-3xl bg-wash text-water-deep"><Icon name={s.icon} size={48} strokeWidth={1.6} /></div>
+        <div className="mt-6 grid h-24 w-24 place-items-center rounded-3xl bg-water/10 text-water"><Icon name={s.icon} size={46} strokeWidth={2} /></div>
         <h3 className="mt-5 font-display text-xl font-medium text-ink">{t(s.titleKey, lang)}</h3>
         <p className="mt-2 min-h-20 leading-relaxed text-ink/70">{t(s.bodyKey, lang)}</p>
         <div className="mt-6 flex gap-3">
