@@ -103,6 +103,17 @@ export const dict: Dict = {
   alreadyBest: { uz: 'Siz eng tejamkor usuldan foydalanmoqdasiz — barakalla!', ru: 'Вы используете самый экономный способ — отлично!' },
   yourMethod: { uz: 'Sizning usulingiz', ru: 'Ваш способ' },
   efficiency: { uz: 'samaradorlik', ru: 'КПД' },
+  // National impact
+  nationalTitle: { uz: 'Butun O‘zbekiston bo‘yicha', ru: 'По всему Узбекистану' },
+  nationalSub: { uz: 'Tomchi jamoasi birgalikda tejagan suv', ru: 'Сколько воды сообщество Tomchi сэкономило вместе' },
+  nationalSaved: { uz: 'Jami tejalgan suv', ru: 'Всего сэкономлено воды' },
+  nationalGrowing: { uz: 'va o‘smoqda', ru: 'и растёт' },
+  nationalFields: { uz: 'faol dala', ru: 'активных полей' },
+  nationalRegions: { uz: 'viloyat', ru: 'регионов' },
+  mapTitle: { uz: 'Viloyatlar bo‘yicha tejamkorlik', ru: 'Экономия по регионам' },
+  nationalEmpty: { uz: 'Hali ma’lumot yo‘q — birinchi bo‘ling!', ru: 'Пока нет данных — станьте первым!' },
+  nationalLoading: { uz: 'Yuklanmoqda…', ru: 'Загрузка…' },
+  mapLegend: { uz: 'Doira kattaligi — tejalgan suv hajmi', ru: 'Размер круга — объём сэкономленной воды' },
   // Soil
   stepSoil: { uz: 'Tuproq turi', ru: 'Тип почвы' },
   soil_sandy: { uz: 'Qumloq', ru: 'Песчаная' },

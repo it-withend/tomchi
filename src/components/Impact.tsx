@@ -2,6 +2,7 @@ import { useApp } from '../state';
 import { t, fmt, formatNum } from '../i18n';
 import { seasonTotals, SOM_PER_M3, POOL_M3, type FieldConfig } from '../engine/irrigation';
 import { methodEfficiency } from '../data/crops';
+import { NationalImpact } from './NationalImpact';
 
 export function Impact({ field }: { field: FieldConfig }) {
   const { lang } = useApp();
@@ -66,6 +67,8 @@ export function Impact({ field }: { field: FieldConfig }) {
         <span className="text-2xl" aria-hidden>🌊</span>
         <p className="text-sm leading-relaxed text-ink/70">{t('aralNote', lang)}</p>
       </div>
+
+      <NationalImpact />
     </div>
   );
 }
