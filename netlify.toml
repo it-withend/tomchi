@@ -4,6 +4,13 @@
   publish = "dist"
   functions = "netlify/functions"
 
+# These keys are public by design — the Supabase project URL and the anon /
+# publishable key ship in the client bundle (protected by row-level security).
+# Exclude them from secrets scanning; the real secrets (service-role key, bot
+# token, webhook secret) stay scanned because they must never appear in output.
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "SUPABASE_URL,VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY"
+
 [functions]
   node_bundler = "esbuild"
 
