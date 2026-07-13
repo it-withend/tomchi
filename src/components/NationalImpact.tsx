@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useApp } from '../state';
 import { t, fmt, formatNum } from '../i18n';
 import { regions } from '../data/regions';
+import { getCrop } from '../engine/irrigation';
 import { Icon } from './Icon';
 import { uzShapes, UZ_W, UZ_H } from '../data/uzGeo';
 import { fetchNationalImpact, type NationalImpact as Data } from '../lib/nationalImpact';
@@ -162,6 +163,36 @@ export function NationalImpact() {
           )}
         </div>
       </div>
+
+      {/* Leaderboard — most water-thrifty farmers */}
+      {dataReady && data!.top.length > 0 && (
+        <div className="mt-8">
+          <div className="mb-1 flex items-center gap-2">
+            <Icon name="trophy" size={20} className="text-clay" />
+            <h3 className="font-display text-lg font-medium text-ink">{t('leaderTitle', lang)}</h3>
+          </div>
+          <p className="mb-4 text-sm text-ink/60">{t('leaderSub', lang)}</p>
+          <ol className="divide-y divide-line overflow-hidden rounded-3xl border border-line bg-card">
+            {data!.top.map((e, i) => {
+              const crop = getCrop(e.cropId);
+              const medal = ['bg-[#eab308] text-white', 'bg-[#94a3b8] text-white', 'bg-[#c17a3a] text-white'][i] ?? 'bg-wash text-ink/50';
+              return (
+                <li key={i} className={`flex items-center gap-3 px-4 py-3 ${e.you ? 'bg-water/10' : ''}`}>
+                  <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-sm font-bold ${medal}`}>{i + 1}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-center gap-1.5 text-sm font-medium text-ink">
+                      {nameOf(e.regionId, lang)}
+                      {e.you && <span className="rounded-full bg-water px-2 py-0.5 text-[10px] font-medium text-white">{t('leaderYou', lang)}</span>}
+                    </span>
+                    <span className="block text-xs text-ink/50">{crop.emoji} {crop.name[lang]}</span>
+                  </span>
+                  <span className="shrink-0 text-sm font-semibold tabular-nums text-water-deep">{formatNum(e.saved, lang)} m³</span>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      )}
     </section>
   );
 }
