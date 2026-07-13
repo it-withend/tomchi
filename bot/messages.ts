@@ -37,8 +37,8 @@ export const M: M = {
     ru: 'У вас пока нет поля. Создайте поле в приложении или подключите через /link код.',
   },
   menu: {
-    uz: '📋 Buyruqlar:\n/today — bugungi suv me’yori\n/calendar — mavsumiy taqvim\n/savings — suv va pul tejamkorligi\n/stop — eslatmalarni o‘chirish',
-    ru: '📋 Команды:\n/today — норма воды на сегодня\n/calendar — сезонный календарь\n/savings — экономия воды и денег\n/stop — выключить напоминания',
+    uz: '📋 Buyruqlar:\n/today — bugungi suv me’yori\n/calendar — mavsumiy taqvim\n/savings — suv va pul tejamkorligi\n/history — sug‘orish tarixi\n/stop — eslatmalarni o‘chirish',
+    ru: '📋 Команды:\n/today — норма воды на сегодня\n/calendar — сезонный календарь\n/savings — экономия воды и денег\n/history — история поливов\n/stop — выключить напоминания',
   },
   calendarHeader: { uz: '📅 <b>Mavsumiy sug‘orish taqvimi</b>', ru: '📅 <b>Сезонный календарь полива</b>' },
   calendarTotal: { uz: 'Mavsum jami: <b>{v} m³</b>', ru: 'Итого за сезон: <b>{v} m³</b>' },
@@ -46,6 +46,10 @@ export const M: M = {
   savingsWater: { uz: '💧 Tejalgan suv: <b>{v} m³</b> ({method}, egatga nisbatan)', ru: '💧 Сэкономлено воды: <b>{v} m³</b> ({method}, против арычного)' },
   savingsMoney: { uz: '💰 Tejalgan mablag‘: <b>{v} so‘m</b> / mavsum', ru: '💰 Сэкономлено денег: <b>{v} сум</b> / сезон' },
   savingsBest: { uz: 'Siz eng tejamkor usuldan foydalanyapsiz — barakalla!', ru: 'Вы используете самый экономный способ — отлично!' },
+  historyHeader: { uz: '📖 <b>Sug‘orish tarixi</b> (oxirgi {n})', ru: '📖 <b>История поливов</b> (последние {n})' },
+  historyEmpty: { uz: 'Hali sug‘orish qaydlari yo‘q. Ilovada suv quyganingizni belgilang.', ru: 'Пока нет записей о поливе. Отмечайте полив в приложении.' },
+  historyWatered: { uz: '💧 {date} — sug‘orildi', ru: '💧 {date} — полив' },
+  historyRain: { uz: '🌧️ {date} — yomg‘ir', ru: '🌧️ {date} — дождь' },
 };
 
 export const monthShort: Record<string, string[]> = {

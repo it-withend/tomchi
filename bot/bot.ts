@@ -6,7 +6,7 @@ import { m, stageName, methodName, soilName, monthShort } from './messages';
 import { regions } from '../src/data/regions';
 import { crops, type Crop } from '../src/data/crops';
 import { dayStatus, getCrop, getRegion, seasonCalendar, seasonTotals, SOM_PER_M3, type FieldConfig } from '../src/engine/irrigation';
-import { supaEnabled, linkChat, isLinked, fieldsForChat, subscribedChats, setSubscribed } from './supa';
+import { supaEnabled, linkChat, isLinked, fieldsForChat, subscribedChats, setSubscribed, eventsForChat } from './supa';
 
 type Lang = store.Lang;
 
@@ -141,11 +141,16 @@ function soilKb(lang: Lang) {
 }
 
 function menuKb(lang: Lang): InlineButton[][] {
-  return [[
-    { text: lang === 'uz' ? '💧 Bugun' : '💧 Сегодня', callback_data: 'cmd:today' },
-    { text: lang === 'uz' ? '📅 Taqvim' : '📅 Календарь', callback_data: 'cmd:calendar' },
-    { text: lang === 'uz' ? '🌊 Tejamkorlik' : '🌊 Экономия', callback_data: 'cmd:savings' },
-  ]];
+  return [
+    [
+      { text: lang === 'uz' ? '💧 Bugun' : '💧 Сегодня', callback_data: 'cmd:today' },
+      { text: lang === 'uz' ? '📅 Taqvim' : '📅 Календарь', callback_data: 'cmd:calendar' },
+    ],
+    [
+      { text: lang === 'uz' ? '🌊 Tejamkorlik' : '🌊 Экономия', callback_data: 'cmd:savings' },
+      { text: lang === 'uz' ? '📖 Tarix' : '📖 История', callback_data: 'cmd:history' },
+    ],
+  ];
 }
 
 async function replyToday(chatId: number, lang: Lang, sub?: store.Subscriber) {
@@ -163,6 +168,20 @@ async function replySavings(chatId: number, lang: Lang, sub?: store.Subscriber) 
   const fields = await resolveFields(chatId, sub);
   if (!fields.length) { await sendMessage(chatId, m('noFields', lang)); return; }
   await sendMessage(chatId, savingsText(fields, lang), menuKb(lang));
+}
+
+function fmtDate(iso: string, lang: Lang): string {
+  const d = new Date(iso);
+  return `${d.getDate()} ${monthShort[lang][d.getMonth()]} ${d.getFullYear()}`;
+}
+async function replyHistory(chatId: number, lang: Lang) {
+  const events = await eventsForChat(chatId, 12);
+  if (!events.length) { await sendMessage(chatId, m('historyEmpty', lang), menuKb(lang)); return; }
+  const lines = events.map((e) =>
+    m(e.type === 'rain' ? 'historyRain' : 'historyWatered', lang, { date: fmtDate(e.at, lang) }),
+  );
+  const text = [m('historyHeader', lang, { n: events.length }), '', ...lines].join('\n');
+  await sendMessage(chatId, text, menuKb(lang));
 }
 
 // ---- update handling --------------------------------------------------------
@@ -200,6 +219,7 @@ async function onMessage(msg: any) {
   if (text.startsWith('/today')) { await replyToday(chatId, lang, sub); return; }
   if (text.startsWith('/calendar') || text.startsWith('/taqvim')) { await replyCalendar(chatId, lang, sub); return; }
   if (text.startsWith('/savings') || text.startsWith('/tejamkorlik')) { await replySavings(chatId, lang, sub); return; }
+  if (text.startsWith('/history') || text.startsWith('/tarix')) { await replyHistory(chatId, lang); return; }
   // any other text
   await sendMessage(chatId, m('help', lang));
 }
@@ -244,6 +264,7 @@ async function onCallback(cb: any) {
       if (value === 'today') await replyToday(chatId, lang, sub);
       else if (value === 'calendar') await replyCalendar(chatId, lang, sub);
       else if (value === 'savings') await replySavings(chatId, lang, sub);
+      else if (value === 'history') await replyHistory(chatId, lang);
       break;
     }
   }

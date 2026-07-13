@@ -57,6 +57,22 @@ export async function fieldsForChat(chatId: number): Promise<FieldConfig[]> {
   return (rows ?? []).map(rowToField);
 }
 
+export type WEvent = { fieldId: string; type: 'watered' | 'rain'; at: string };
+
+/** Recent watering events (newest first) for the chat's linked owner. */
+export async function eventsForChat(chatId: number, limit = 12): Promise<WEvent[]> {
+  if (!supa) return [];
+  const { data: link } = await supa.from('bot_links').select('owner').eq('chat_id', chatId).maybeSingle();
+  if (!link) return [];
+  const { data: rows } = await supa
+    .from('watering_events')
+    .select('client_field_id, type, at')
+    .eq('owner', link.owner)
+    .order('at', { ascending: false })
+    .limit(limit);
+  return (rows ?? []).map((r: any) => ({ fieldId: r.client_field_id, type: r.type, at: r.at }));
+}
+
 export async function setSubscribed(chatId: number, subscribed: boolean): Promise<void> {
   if (!supa) return;
   await supa.from('bot_links').update({ subscribed }).eq('chat_id', chatId);
