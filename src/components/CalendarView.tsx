@@ -1,6 +1,7 @@
 import { useApp } from '../state';
 import { t, formatNum } from '../i18n';
 import { seasonCalendar, getCrop, upcomingWaterings, dayStatus, type FieldConfig } from '../engine/irrigation';
+import { Icon } from './Icon';
 
 const monthNames = {
   uz: ['Yan', 'Fev', 'Mar', 'Apr', 'May', 'Iyn', 'Iyl', 'Avg', 'Sen', 'Okt', 'Noy', 'Dek'],
@@ -54,7 +55,7 @@ export function CalendarView({ field }: { field: FieldConfig }) {
               return (
                 <li key={i} className={`flex items-center justify-between rounded-xl px-3 py-2.5 ${i === 0 ? 'bg-water text-white' : 'bg-wash'}`}>
                   <span className="flex items-center gap-2 font-medium">
-                    <span aria-hidden>💧</span> {dateLabel(d, lang)}
+                    <Icon name="drop" size={15} /> {dateLabel(d, lang)}
                   </span>
                   <span className={`text-sm ${i === 0 ? 'text-white/80' : 'text-ink/60'}`}>
                     {formatNum(st.litersPerIrrigation / 1000, lang)} m³

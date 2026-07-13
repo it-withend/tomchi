@@ -4,6 +4,7 @@ import { t } from '../i18n';
 import { diseaseTrees, type TreeNode } from '../data/diseases';
 import { getCrop, type FieldConfig } from '../engine/irrigation';
 import { aiEnabled, diagnoseText, diagnosePhoto } from '../lib/ai';
+import { Icon } from './Icon';
 
 export function Doctor({ field }: { field: FieldConfig }) {
   const { lang } = useApp();
@@ -21,8 +22,8 @@ export function Doctor({ field }: { field: FieldConfig }) {
       <div className="mb-5 flex gap-1 rounded-full bg-wash p-1">
         {(['tree', 'ai'] as const).map((mkey) => (
           <button key={mkey} onClick={() => setMode(mkey)}
-            className={`flex-1 rounded-full py-2 text-sm font-medium ${mode === mkey ? 'bg-card text-water-deep shadow-sm' : 'text-ink/50'}`}>
-            {mkey === 'tree' ? t('treeTab', lang) : '✨ ' + t('aiDoctor', lang)}
+            className={`flex flex-1 items-center justify-center gap-1.5 rounded-full py-2 text-sm font-medium ${mode === mkey ? 'bg-card text-water-deep shadow-sm' : 'text-ink/50'}`}>
+            {mkey === 'tree' ? t('treeTab', lang) : <><Icon name="sparkles" size={15} /> {t('aiDoctor', lang)}</>}
           </button>
         ))}
       </div>
@@ -86,7 +87,7 @@ function SymptomTree({ field }: { field: FieldConfig }) {
       </div>
       {path.length > 1 && (
         <button onClick={() => setPath(path.slice(0, -1))}
-          className="mt-4 text-sm font-medium text-water-deep">← {t('back', lang)}</button>
+          className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-water-deep"><Icon name="back" size={16} /> {t('back', lang)}</button>
       )}
     </div>
   );
@@ -142,11 +143,11 @@ function AiPanel({ field }: { field: FieldConfig }) {
 
       <div className="mt-3 flex gap-2">
         <button onClick={ask} disabled={loading || !symptoms.trim()}
-          className="flex-1 rounded-2xl bg-water py-3.5 font-medium text-white disabled:opacity-40">
-          {loading ? t('aiThinking', lang) : '✨ ' + t('aiAsk', lang)}
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-2xl bg-water py-3.5 font-medium text-white disabled:opacity-40">
+          {loading ? t('aiThinking', lang) : <><Icon name="sparkles" size={16} /> {t('aiAsk', lang)}</>}
         </button>
-        <label className="flex cursor-pointer items-center justify-center rounded-2xl border border-water/40 bg-card px-4 py-3.5 text-sm font-medium text-water-deep">
-          {t('aiPhoto', lang)}
+        <label className="flex cursor-pointer items-center justify-center gap-1.5 rounded-2xl border border-water/40 bg-card px-4 py-3.5 text-sm font-medium text-water-deep">
+          <Icon name="diagnosis" size={16} /> {t('aiPhoto', lang)}
           <input type="file" accept="image/*" capture="environment" onChange={onPhoto} className="hidden" />
         </label>
       </div>
@@ -161,7 +162,7 @@ function AiPanel({ field }: { field: FieldConfig }) {
       {answer && (
         <div className="mt-4">
           <div className="rounded-3xl border border-water/20 bg-card p-5">
-            <p className="text-xs font-medium uppercase tracking-wide text-water-deep">✨ {t('aiDoctor', lang)}</p>
+            <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-water-deep"><Icon name="sparkles" size={14} /> {t('aiDoctor', lang)}</p>
             <div className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-ink">{answer}</div>
           </div>
           <p className="mt-3 text-center text-xs text-ink/40">{t('aiDisclaimer', lang)}</p>

@@ -4,17 +4,18 @@ import { t } from '../i18n';
 import { regions } from '../data/regions';
 import { crops, type Method } from '../data/crops';
 import type { Soil } from '../engine/irrigation';
+import { Icon, type IconName } from './Icon';
 
-const methods: { id: Method; labelKey: string; descKey: string; icon: string }[] = [
-  { id: 'furrow', labelKey: 'furrow', descKey: 'furrowDesc', icon: '〰️' },
-  { id: 'sprinkler', labelKey: 'sprinkler', descKey: 'sprinklerDesc', icon: '🌧️' },
-  { id: 'drip', labelKey: 'drip', descKey: 'dripDesc', icon: '💧' },
+const methods: { id: Method; labelKey: string; descKey: string; icon: IconName }[] = [
+  { id: 'furrow', labelKey: 'furrow', descKey: 'furrowDesc', icon: 'furrow' },
+  { id: 'sprinkler', labelKey: 'sprinkler', descKey: 'sprinklerDesc', icon: 'sprinkler' },
+  { id: 'drip', labelKey: 'drip', descKey: 'dripDesc', icon: 'drop' },
 ];
 
-const soils: { id: Soil; labelKey: string; descKey: string; icon: string }[] = [
-  { id: 'sandy', labelKey: 'soil_sandy', descKey: 'soil_sandyDesc', icon: '🏜️' },
-  { id: 'loam', labelKey: 'soil_loam', descKey: 'soil_loamDesc', icon: '🟫' },
-  { id: 'clay', labelKey: 'soil_clay', descKey: 'soil_clayDesc', icon: '🧱' },
+const soils: { id: Soil; labelKey: string; descKey: string; icon: IconName }[] = [
+  { id: 'sandy', labelKey: 'soil_sandy', descKey: 'soil_sandyDesc', icon: 'sandy' },
+  { id: 'loam', labelKey: 'soil_loam', descKey: 'soil_loamDesc', icon: 'loam' },
+  { id: 'clay', labelKey: 'soil_clay', descKey: 'soil_clayDesc', icon: 'clay' },
 ];
 
 const TOTAL_STEPS = 5;
@@ -36,7 +37,7 @@ export function Onboarding() {
       <div className="mb-3 flex items-center gap-3">
         {step > 1 && (
           <button onClick={() => setStep(step - 1)} aria-label={t('back', lang)}
-            className="grid h-9 w-9 place-items-center rounded-full border border-line bg-card text-water-deep">←</button>
+            className="grid h-9 w-9 place-items-center rounded-full border border-line bg-card text-water-deep"><Icon name="back" size={18} /></button>
         )}
         <div className="flex flex-1 gap-1.5">
           {Array.from({ length: TOTAL_STEPS }, (_, i) => i + 1).map((i) => (
@@ -145,7 +146,7 @@ export function Onboarding() {
             {soils.map((s) => (
               <button key={s.id} onClick={() => { setSoil(s.id); setStep(5); }}
                 className={`flex items-center gap-4 rounded-2xl border p-4 text-left ${soil === s.id ? 'border-water bg-water/5 ring-2 ring-water' : 'border-line bg-card'}`}>
-                <span className="text-3xl" aria-hidden>{s.icon}</span>
+                <Icon name={s.icon} size={30} className="shrink-0 text-water-deep" />
                 <span>
                   <span className="block font-medium">{t(s.labelKey, lang)}</span>
                   <span className="block text-sm text-ink/60">{t(s.descKey, lang)}</span>
@@ -162,7 +163,7 @@ export function Onboarding() {
             {methods.map((m) => (
               <button key={m.id} onClick={() => setMethod(m.id)}
                 className={`flex items-center gap-4 rounded-2xl border p-4 text-left ${method === m.id ? 'border-water bg-water/5 ring-2 ring-water' : 'border-line bg-card'}`}>
-                <span className="text-3xl" aria-hidden>{m.icon}</span>
+                <Icon name={m.icon} size={30} className="shrink-0 text-water-deep" />
                 <span>
                   <span className="block font-medium">{t(m.labelKey, lang)}</span>
                   <span className="block text-sm text-ink/60">{t(m.descKey, lang)}</span>

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useApp } from '../state';
 import { t, fmt, formatNum } from '../i18n';
 import { regions } from '../data/regions';
+import { Icon } from './Icon';
 import { uzShapes, UZ_W, UZ_H } from '../data/uzGeo';
 import { fetchNationalImpact, type NationalImpact as Data } from '../lib/nationalImpact';
 
@@ -67,7 +68,7 @@ export function NationalImpact() {
 
       {/* Animated counter */}
       <div className="relative overflow-hidden rounded-3xl bg-water-deep p-6 text-white">
-        <div className="absolute -right-8 -top-8 text-[9rem] leading-none opacity-10" aria-hidden>💧</div>
+        <Icon name="drop" size={150} strokeWidth={1} className="pointer-events-none absolute -right-6 -top-6 opacity-10" />
         <p className="text-sm opacity-80">{t('nationalSaved', lang)}</p>
         {!dataReady ? (
           <div className="mt-2 h-9 w-40 animate-pulse rounded-lg bg-white/20" />
@@ -76,12 +77,12 @@ export function NationalImpact() {
             <p className="mt-1 font-display text-4xl font-bold tabular-nums">
               {formatNum(Math.round(animated), lang)} <span className="text-2xl">m³</span>
             </p>
-            <p className="mt-0.5 text-sm opacity-80">
-              💰 {formatNum(data!.totalMoney, lang)} {t('som', lang)} · {t('nationalGrowing', lang)}
+            <p className="mt-0.5 flex items-center gap-1.5 text-sm opacity-80">
+              <Icon name="coins" size={15} /> {formatNum(data!.totalMoney, lang)} {t('som', lang)} · {t('nationalGrowing', lang)}
             </p>
             {data!.pools >= 1 && (
-              <p className="mt-4 inline-block rounded-xl bg-white/10 px-3 py-2 text-sm">
-                🏊 {fmt(t('equalPools', lang), Math.round(data!.pools))}
+              <p className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-white/10 px-3 py-2 text-sm">
+                <Icon name="pool" size={16} /> {fmt(t('equalPools', lang), Math.round(data!.pools))}
               </p>
             )}
             <div className="mt-4 flex gap-6">
@@ -151,10 +152,10 @@ export function NationalImpact() {
         {/* selection detail / hint */}
         <div className="mt-2 min-h-[2.5rem] rounded-2xl bg-wash px-4 py-2 text-sm">
           {!selected ? (
-            <span className="text-ink/50">👆 {t('mapTapHint', lang)}</span>
+            <span className="flex items-center gap-1.5 text-ink/50"><Icon name="tap" size={15} /> {t('mapTapHint', lang)}</span>
           ) : sel ? (
-            <span className="text-ink">
-              <b>{nameOf(selected, lang)}</b> — 💧 {formatNum(sel.saved, lang)} m³ · {formatNum(sel.count, lang)} {t('regionFields', lang)}
+            <span className="flex items-center gap-1.5 text-ink">
+              <b>{nameOf(selected, lang)}</b> — <Icon name="drop" size={14} className="text-water" /> {formatNum(sel.saved, lang)} m³ · {formatNum(sel.count, lang)} {t('regionFields', lang)}
             </span>
           ) : (
             <span className="text-ink/60"><b>{nameOf(selected, lang)}</b> — {t('regionNoData', lang)}</span>

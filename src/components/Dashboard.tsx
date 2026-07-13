@@ -8,6 +8,7 @@ import { useForecast } from '../useForecast';
 import { dayFrom, nextRainDay, RAIN_SKIP_MM } from '../engine/weather';
 import { openReport } from '../engine/report';
 import { DropGauge } from './DropGauge';
+import { Icon } from './Icon';
 
 export function Dashboard({ field }: { field: FieldConfig }) {
   const { lang, fields, setActiveFieldId, setAdding, logWatering, removeField, syncEnabled } = useApp();
@@ -70,7 +71,7 @@ export function Dashboard({ field }: { field: FieldConfig }) {
       {/* weather-aware rain advice */}
       {s.inSeason && rainDay && (
         <div className="mb-3 flex items-start gap-3 rounded-2xl border border-water/30 bg-water/5 p-3.5">
-          <span className="text-xl" aria-hidden>🌧️</span>
+          <Icon name="rain" size={22} className="shrink-0 text-water-deep" />
           <p className="text-sm leading-snug text-water-deep">
             {rainTodayHeavy
               ? t('rainToday', lang)
@@ -97,8 +98,8 @@ export function Dashboard({ field }: { field: FieldConfig }) {
             </p>
             <p className="text-sm text-ink/60">{showM3 ? t('m3PerDay', lang) : t('litersPerDay', lang)}</p>
             {today && (
-              <p className="mt-1 text-xs text-ink/50">
-                🌡 {formatNum(today.tMax, lang)}° · {t('et0Label', lang)} {formatNum(et0, lang)} {t('mmDay', lang)}
+              <p className="mt-1 flex items-center justify-center gap-1 text-xs text-ink/50">
+                <Icon name="thermometer" size={13} /> {formatNum(today.tMax, lang)}° · {t('et0Label', lang)} {formatNum(et0, lang)} {t('mmDay', lang)}
               </p>
             )}
 
@@ -125,12 +126,12 @@ export function Dashboard({ field }: { field: FieldConfig }) {
               )}
               <div className="mt-3 flex gap-2">
                 <button onClick={() => addEvent('watered')}
-                  className="flex-1 rounded-xl bg-water py-3 text-sm font-medium text-white active:scale-[0.98]">
-                  {t('iWatered', lang)}
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-water py-3 text-sm font-medium text-white active:scale-[0.98]">
+                  <Icon name="check" size={16} /> {t('iWatered', lang)}
                 </button>
                 <button onClick={() => addEvent('rain')} title={t('rainNote', lang)}
-                  className="flex-1 rounded-xl border border-water/40 bg-card py-3 text-sm font-medium text-water-deep active:scale-[0.98]">
-                  {t('itRained', lang)}
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-water/40 bg-card py-3 text-sm font-medium text-water-deep active:scale-[0.98]">
+                  <Icon name="rain" size={16} /> {t('itRained', lang)}
                 </button>
               </div>
             </div>
@@ -190,8 +191,8 @@ export function Dashboard({ field }: { field: FieldConfig }) {
         <div className="flex items-center justify-between">
           <p className="text-xs font-medium uppercase tracking-wide text-ink/50">{t('history', lang)}</p>
           <button onClick={() => openReport(field, lang)}
-            className="rounded-full bg-water/10 px-3 py-1 text-xs font-medium text-water-deep">
-            📄 PDF
+            className="inline-flex items-center gap-1 rounded-full bg-water/10 px-3 py-1 text-xs font-medium text-water-deep">
+            <Icon name="file" size={13} /> PDF
           </button>
         </div>
         {log.length ? (
@@ -199,7 +200,7 @@ export function Dashboard({ field }: { field: FieldConfig }) {
             {log.map((e, i) => (
               <li key={i} className="flex items-center justify-between text-sm">
                 <span className="flex items-center gap-2">
-                  <span aria-hidden>{e.type === 'rain' ? '🌧️' : '💧'}</span>
+                  <Icon name={e.type === 'rain' ? 'rain' : 'drop'} size={15} className="text-water" />
                   {e.type === 'rain' ? t('typeRain', lang) : t('typeWatered', lang)}
                 </span>
                 <span className="text-ink/50">{formatDate(new Date(e.date), lang)}</span>
@@ -215,12 +216,12 @@ export function Dashboard({ field }: { field: FieldConfig }) {
       {syncEnabled && (
         <button onClick={() => setShowConnect(true)}
           className="mt-5 flex w-full items-center gap-3 rounded-2xl border border-water/30 bg-water/5 p-4 text-left">
-          <span className="text-2xl" aria-hidden>✈️</span>
+          <Icon name="send" size={24} className="shrink-0 text-water-deep" />
           <span className="flex-1">
             <span className="block text-sm font-medium text-water-deep">{t('connectTg', lang)}</span>
             <span className="block text-xs text-ink/60">{t('connectTgDesc', lang)}</span>
           </span>
-          <span className="text-water-deep" aria-hidden>›</span>
+          <Icon name="chevron" size={18} className="text-water-deep" />
         </button>
       )}
 

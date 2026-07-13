@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useApp } from '../state';
 import { t } from '../i18n';
+import { Icon, type IconName } from './Icon';
 
-const slides = [
-  { icon: '🧑‍🌾', titleKey: 'tut1Title', bodyKey: 'tut1Body' },
-  { icon: '💧', titleKey: 'tut2Title', bodyKey: 'tut2Body' },
-  { icon: '🌾', titleKey: 'tut3Title', bodyKey: 'tut3Body' },
-  { icon: '📅', titleKey: 'tut4Title', bodyKey: 'tut4Body' },
-  { icon: '🩺', titleKey: 'tut5Title', bodyKey: 'tut5Body' },
-  { icon: '🌊', titleKey: 'tut6Title', bodyKey: 'tut6Body' },
+const slides: { icon: IconName; titleKey: string; bodyKey: string }[] = [
+  { icon: 'user', titleKey: 'tut1Title', bodyKey: 'tut1Body' },
+  { icon: 'drop', titleKey: 'tut2Title', bodyKey: 'tut2Body' },
+  { icon: 'sprout', titleKey: 'tut3Title', bodyKey: 'tut3Body' },
+  { icon: 'calendar', titleKey: 'tut4Title', bodyKey: 'tut4Body' },
+  { icon: 'diagnosis', titleKey: 'tut5Title', bodyKey: 'tut5Body' },
+  { icon: 'waves', titleKey: 'tut6Title', bodyKey: 'tut6Body' },
 ];
 
 export function Tutorial({ onClose }: { onClose: () => void }) {
@@ -35,13 +36,13 @@ export function Tutorial({ onClose }: { onClose: () => void }) {
           </div>
           <button onClick={onClose} className="text-sm font-medium text-ink/50">{t('tutSkip', lang)}</button>
         </div>
-        <div className="mt-6 grid h-24 w-24 place-items-center rounded-3xl bg-wash text-5xl" aria-hidden>{s.icon}</div>
+        <div className="mt-6 grid h-24 w-24 place-items-center rounded-3xl bg-wash text-water-deep"><Icon name={s.icon} size={48} strokeWidth={1.6} /></div>
         <h3 className="mt-5 font-display text-xl font-medium text-ink">{t(s.titleKey, lang)}</h3>
         <p className="mt-2 min-h-20 leading-relaxed text-ink/70">{t(s.bodyKey, lang)}</p>
         <div className="mt-6 flex gap-3">
           {i > 0 && (
-            <button onClick={() => setI(i - 1)}
-              className="rounded-2xl border border-line px-5 py-3.5 font-medium text-water-deep">←</button>
+            <button onClick={() => setI(i - 1)} aria-label={t('back', lang)}
+              className="grid place-items-center rounded-2xl border border-line px-5 py-3.5 text-water-deep"><Icon name="back" size={18} /></button>
           )}
           <button onClick={() => (last ? onClose() : setI(i + 1))}
             className="flex-1 rounded-2xl bg-water py-3.5 font-display text-base font-medium text-white">

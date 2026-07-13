@@ -8,14 +8,15 @@ import { Doctor } from './components/Doctor';
 import { Impact } from './components/Impact';
 import { Tutorial } from './components/Tutorial';
 import { Splash } from './components/Splash';
+import { Icon, type IconName } from './components/Icon';
 
 type Tab = 'today' | 'calendar' | 'doctor' | 'impact';
 
-const tabs: { id: Tab; labelKey: string; icon: string }[] = [
-  { id: 'today', labelKey: 'tabToday', icon: '💧' },
-  { id: 'calendar', labelKey: 'tabCalendar', icon: '📅' },
-  { id: 'doctor', labelKey: 'tabDoctor', icon: '🩺' },
-  { id: 'impact', labelKey: 'tabImpact', icon: '🌊' },
+const tabs: { id: Tab; labelKey: string; icon: IconName }[] = [
+  { id: 'today', labelKey: 'tabToday', icon: 'drop' },
+  { id: 'calendar', labelKey: 'tabCalendar', icon: 'calendar' },
+  { id: 'doctor', labelKey: 'tabDoctor', icon: 'diagnosis' },
+  { id: 'impact', labelKey: 'tabImpact', icon: 'waves' },
 ];
 
 export default function App() {
@@ -48,9 +49,9 @@ export default function App() {
         <div className="flex gap-2">
           <button
             onClick={() => setShowHelp(true)}
-            className="grid h-7 w-7 place-items-center rounded-full border border-line bg-card text-xs font-bold text-water-deep"
+            className="grid h-7 w-7 place-items-center rounded-full border border-line bg-card text-water-deep"
             aria-label={t('help', lang)}>
-            ?
+            <Icon name="help" size={16} />
           </button>
           <button
             onClick={() => setLang(lang === 'uz' ? 'ru' : 'uz')}
@@ -80,7 +81,7 @@ export default function App() {
             <button key={tb.id} onClick={() => setTab(tb.id)}
               aria-current={tab === tb.id ? 'page' : undefined}
               className={`flex flex-1 flex-col items-center gap-0.5 py-2.5 text-[11px] font-medium ${tab === tb.id ? 'text-water-deep' : 'text-ink/40'}`}>
-              <span className={`text-xl leading-none ${tab === tb.id ? '' : 'grayscale opacity-60'}`} aria-hidden>{tb.icon}</span>
+              <Icon name={tb.icon} size={22} strokeWidth={tab === tb.id ? 2 : 1.7} />
               {t(tb.labelKey, lang)}
             </button>
           ))}

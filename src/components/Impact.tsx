@@ -3,6 +3,7 @@ import { t, fmt, formatNum } from '../i18n';
 import { seasonTotals, SOM_PER_M3, POOL_M3, type FieldConfig } from '../engine/irrigation';
 import { methodEfficiency } from '../data/crops';
 import { NationalImpact } from './NationalImpact';
+import { Icon } from './Icon';
 
 export function Impact({ field }: { field: FieldConfig }) {
   const { lang } = useApp();
@@ -37,8 +38,8 @@ export function Impact({ field }: { field: FieldConfig }) {
             <p className="mt-1 font-display text-4xl font-bold">{formatNum(tot.m3Saved, lang)} m³</p>
             <p className="mt-0.5 text-sm opacity-80">{t('vsFlood', lang)}</p>
             {pools >= 1 && (
-              <p className="mt-4 rounded-xl bg-white/10 px-3 py-2 text-sm">
-                🏊 {fmt(t('equalPools', lang), Math.round(pools))}
+              <p className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-white/10 px-3 py-2 text-sm">
+                <Icon name="pool" size={16} /> {fmt(t('equalPools', lang), Math.round(pools))}
               </p>
             )}
           </div>
@@ -64,7 +65,7 @@ export function Impact({ field }: { field: FieldConfig }) {
 
       <div className="canal my-6" aria-hidden />
       <div className="flex items-start gap-3 rounded-2xl border border-line bg-card p-4">
-        <span className="text-2xl" aria-hidden>🌊</span>
+        <Icon name="waves" size={24} className="mt-0.5 shrink-0 text-water" />
         <p className="text-sm leading-relaxed text-ink/70">{t('aralNote', lang)}</p>
       </div>
 
