@@ -49,6 +49,13 @@ export async function isLinked(chatId: number): Promise<boolean> {
   return !!data;
 }
 
+/** Language chosen when the chat was linked (so replies match the app language). */
+export async function linkedLang(chatId: number): Promise<string | null> {
+  if (!supa) return null;
+  const { data } = await supa.from('bot_links').select('lang').eq('chat_id', chatId).maybeSingle();
+  return data?.lang ?? null;
+}
+
 export async function fieldsForChat(chatId: number): Promise<FieldConfig[]> {
   if (!supa) return [];
   const { data: link } = await supa.from('bot_links').select('owner').eq('chat_id', chatId).maybeSingle();

@@ -7,7 +7,7 @@ import { m, stageName, methodName, soilName, monthShort } from './messages';
 import { regions } from '../src/data/regions';
 import { crops, type Crop } from '../src/data/crops';
 import { dayStatus, getCrop, getRegion, seasonCalendar, seasonTotals, SOM_PER_M3, type FieldConfig } from '../src/engine/irrigation';
-import { supaEnabled, linkChat, isLinked, fieldsForChat, subscribedChats, setSubscribed, eventsForChat } from './supa';
+import { supaEnabled, linkChat, isLinked, linkedLang, fieldsForChat, subscribedChats, setSubscribed, eventsForChat } from './supa';
 
 // ---- helpers ----------------------------------------------------------------
 
@@ -110,6 +110,13 @@ function fmtDate(iso: string, lang: Lang): string {
   return `${d.getDate()} ${monthShort[lang][d.getMonth()]} ${d.getFullYear()}`;
 }
 
+/** Reply language: user's in-bot choice, else the language from the app link. */
+async function resolveLang(chatId: number, sub?: Subscriber): Promise<Lang> {
+  if (sub?.lang) return sub.lang;
+  const l = await linkedLang(chatId);
+  return l === 'ru' ? 'ru' : 'uz';
+}
+
 /** Resolve the fields for a chat: linked app fields take priority. */
 async function resolveFields(chatId: number, sub?: Subscriber): Promise<FieldConfig[]> {
   if (await isLinked(chatId)) return fieldsForChat(chatId);
@@ -182,7 +189,7 @@ async function onMessage(msg: any) {
   const chatId = msg.chat.id;
   const text: string = msg.text ?? '';
   const sub = await getSub(chatId);
-  const lang: Lang = sub?.lang ?? 'uz';
+  const lang: Lang = await resolveLang(chatId, sub);
 
   if (text.startsWith('/start')) {
     await upsertSub(chatId, { step: 'lang' });
@@ -217,8 +224,8 @@ async function onCallback(cb: any) {
   const messageId = cb.message.message_id;
   const [act, value] = (cb.data as string).split(':');
   await answerCallback(cb.id);
-  const sub = (await getSub(chatId)) ?? (await upsertSub(chatId, {}));
-  const lang: Lang = sub.lang;
+  const sub = await getSub(chatId);
+  const lang: Lang = await resolveLang(chatId, sub);
 
   switch (act) {
     case 'lang': {
