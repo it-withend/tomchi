@@ -167,6 +167,28 @@ export const dict: Dict = {
     ru: 'Поливая по приложению, вы видите, сколько воды и денег сэкономите за сезон. Экономия воды — польза и для Арала, и для вашего кармана. Появятся вопросы — нажмите «?» сверху, эта инструкция откроется снова.',
   },
   help: { uz: 'Yordam', ru: 'Помощь' },
+  // Weather
+  liveWeather: { uz: 'Jonli ob-havo', ru: 'Живая погода' },
+  climateNormal: { uz: 'Iqlim me’yori', ru: 'Климатическая норма' },
+  rainSoon: { uz: 'Yomg‘ir kutilmoqda — sug‘orishni kuting', ru: 'Ожидается дождь — отложите полив' },
+  rainToday: { uz: 'Bugun yomg‘ir — sug‘ormang', ru: 'Сегодня дождь — не поливайте' },
+  rainInDays: { uz: '%s: %s mm yomg‘ir. Sug‘orishga shoshilmang.', ru: '%s: дождь %s мм. Не спешите с поливом.' },
+  weatherOffline: { uz: 'Ob-havo yuklanmadi — iqlim me’yori ishlatilmoqda', ru: 'Погода не загрузилась — используется климатическая норма' },
+  forecast7: { uz: '7 kunlik ob-havo', ru: 'Погода на 7 дней' },
+  // History
+  history: { uz: 'Sug‘orish tarixi', ru: 'История поливов' },
+  noHistory: { uz: 'Hali sug‘orish belgilanmagan', ru: 'Поливов пока не отмечено' },
+  typeWatered: { uz: 'Sug‘orish', ru: 'Полив' },
+  typeRain: { uz: 'Yomg‘ir', ru: 'Дождь' },
+  clearHistory: { uz: 'Tarixni tozalash', ru: 'Очистить историю' },
+  // PDF report
+  exportPdf: { uz: 'Agronom uchun hisobot (PDF)', ru: 'Отчёт для агронома (PDF)' },
+  reportTitle: { uz: 'Sug‘orish hisoboti', ru: 'Отчёт по орошению' },
+  reportField: { uz: 'Dala', ru: 'Поле' },
+  reportGenerated: { uz: 'Tuzilgan sana', ru: 'Дата составления' },
+  reportSeasonNeed: { uz: 'Mavsumiy suv talabi', ru: 'Сезонная потребность в воде' },
+  reportPrint: { uz: 'Chop etish / PDF saqlash', ru: 'Печать / Сохранить PDF' },
+  print: { uz: 'Chop etish', ru: 'Печать' },
   // misc
   yes: { uz: 'Ha', ru: 'Да' },
   no: { uz: "Yo'q", ru: 'Нет' },

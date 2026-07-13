@@ -64,7 +64,7 @@ export function Onboarding() {
           ))}
         </div>
         <div>
-          <img src="/logo.svg" alt="" className="mb-6 h-28 w-28 rounded-3xl shadow-md" aria-hidden />
+          <img src="/tomchi.png" alt="" className="mb-6 h-28 w-28 rounded-3xl shadow-md" aria-hidden />
           <h1 className="font-display text-4xl font-bold leading-tight text-water-deep">{t('appName', lang)}</h1>
           <p className="mt-1 font-display text-sm text-clay">{t('tagline', lang)}</p>
           <h2 className="mt-6 text-2xl font-bold leading-snug">{t('welcomeTitle', lang)}</h2>

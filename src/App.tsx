@@ -35,7 +35,7 @@ export default function App() {
       {/* top bar */}
       <header className="flex items-center justify-between px-5 pt-5">
         <p className="flex items-center gap-2 font-display text-lg font-bold text-water-deep">
-          <img src="/logo.svg" alt="" className="h-7 w-7 rounded-lg" aria-hidden />
+          <img src="/tomchi.png" alt="" className="h-7 w-7 rounded-lg" aria-hidden />
           {t('appName', lang)}
           <span className="align-middle font-body text-[11px] font-normal tracking-wide text-clay">
             {t('tagline', lang)}

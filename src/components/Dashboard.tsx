@@ -1,7 +1,10 @@
 import { useApp } from '../state';
 import { t, fmt, formatNum, formatDate } from '../i18n';
-import { dayStatus, getCrop, getRegion, nextWatering, type FieldConfig } from '../engine/irrigation';
+import { dayStatus, getCrop, getRegion, nextWatering, lastEventDate, type FieldConfig } from '../engine/irrigation';
 import { methodEfficiency } from '../data/crops';
+import { useForecast } from '../useForecast';
+import { dayFrom, nextRainDay, RAIN_SKIP_MM } from '../engine/weather';
+import { openReport } from '../engine/report';
 import { DropGauge } from './DropGauge';
 
 export function Dashboard({ field }: { field: FieldConfig }) {
@@ -10,16 +13,30 @@ export function Dashboard({ field }: { field: FieldConfig }) {
   const crop = getCrop(field.cropId);
   const region = getRegion(field.regionId);
   const next = nextWatering(field);
+  const forecast = useForecast(field.regionId);
+
+  const today = dayFrom(forecast);
+  const rainDay = nextRainDay(forecast);
+  const live = today && today.et0 > 0;
+
+  // If we have live ET0, scale today's need by the ratio to the climate norm
+  const et0 = live ? today!.et0 : s.et0;
+  const ratio = s.et0 > 0 ? et0 / s.et0 : 1;
+  const liters = s.litersPerDay * ratio;
 
   // peak-season gross need for gauge scale
   const peakMm = Math.max(...region.et0) * Math.max(...crop.stages.map((x) => x.kc)) / methodEfficiency[field.method];
-  const fill = s.inSeason && peakMm > 0 ? s.grossMm / peakMm : 0;
+  const fill = s.inSeason && peakMm > 0 ? (s.grossMm * ratio) / peakMm : 0;
 
   const fert = crop.fertilizer.find((f) => f.stage === s.stage);
-  const liters = s.litersPerDay;
   const showM3 = liters >= 20000;
+  const last = lastEventDate(field);
+  const log = [...(field.log ?? [])].reverse().slice(0, 6);
 
-  const markWatered = () => updateField(field.id, { lastWatered: new Date().toISOString() });
+  const addEvent = (type: 'watered' | 'rain') =>
+    updateField(field.id, { log: [...(field.log ?? []), { date: new Date().toISOString(), type }] });
+
+  const rainTodayHeavy = today && today.rainMm >= RAIN_SKIP_MM;
 
   return (
     <div className="px-5 pb-28 pt-4">
@@ -48,11 +65,28 @@ export function Dashboard({ field }: { field: FieldConfig }) {
           className="text-xs font-medium text-clay">{t('deleteField', lang)}</button>
       </div>
 
+      {/* weather-aware rain advice */}
+      {s.inSeason && rainDay && (
+        <div className="mb-3 flex items-start gap-3 rounded-2xl border border-water/30 bg-water/5 p-3.5">
+          <span className="text-xl" aria-hidden>🌧️</span>
+          <p className="text-sm leading-snug text-water-deep">
+            {rainTodayHeavy
+              ? t('rainToday', lang)
+              : fmt(t('rainInDays', lang), formatDate(new Date(rainDay.date), lang), formatNum(rainDay.rainMm, lang))}
+          </p>
+        </div>
+      )}
+
       {/* signature gauge */}
       <section className="rounded-3xl border border-line bg-card px-5 pb-6 pt-7 text-center shadow-sm">
-        <h2 className="font-display text-sm font-medium uppercase tracking-wider text-water-deep">
-          {t('todayNeed', lang)}
-        </h2>
+        <div className="flex items-center justify-center gap-2">
+          <h2 className="font-display text-sm font-medium uppercase tracking-wider text-water-deep">
+            {t('todayNeed', lang)}
+          </h2>
+          <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${live ? 'bg-leaf-soft text-leaf' : 'bg-line text-ink/50'}`}>
+            {live ? '● ' + t('liveWeather', lang) : t('climateNormal', lang)}
+          </span>
+        </div>
         {s.inSeason ? (
           <>
             <DropGauge fill={fill} label={t('todayNeed', lang)} />
@@ -60,10 +94,15 @@ export function Dashboard({ field }: { field: FieldConfig }) {
               {showM3 ? formatNum(liters / 1000, lang) : formatNum(liters, lang)}
             </p>
             <p className="text-sm text-ink/60">{showM3 ? t('m3PerDay', lang) : t('litersPerDay', lang)}</p>
+            {today && (
+              <p className="mt-1 text-xs text-ink/50">
+                🌡 {formatNum(today.tMax, lang)}° · {t('et0Label', lang)} {formatNum(et0, lang)} {t('mmDay', lang)}
+              </p>
+            )}
 
             {/* watering journal */}
             <div className={`mt-5 rounded-2xl p-4 text-left ${next && (next.overdue || next.daysLeft === 0) ? 'bg-clay-soft' : 'bg-wash'}`}>
-              {field.lastWatered ? (
+              {last ? (
                 next && next.daysLeft > 0 ? (
                   <div className="flex items-center justify-between">
                     <div>
@@ -73,7 +112,7 @@ export function Dashboard({ field }: { field: FieldConfig }) {
                       </p>
                     </div>
                     <p className="max-w-[45%] text-right text-xs text-ink/50">
-                      {t('lastWatered', lang)}: {formatDate(new Date(field.lastWatered), lang)}
+                      {t('lastWatered', lang)}: {formatDate(new Date(last), lang)}
                     </p>
                   </div>
                 ) : (
@@ -83,11 +122,11 @@ export function Dashboard({ field }: { field: FieldConfig }) {
                 <p className="text-sm leading-relaxed text-ink/60">{t('notWateredYet', lang)}</p>
               )}
               <div className="mt-3 flex gap-2">
-                <button onClick={markWatered}
+                <button onClick={() => addEvent('watered')}
                   className="flex-1 rounded-xl bg-water py-3 text-sm font-medium text-white active:scale-[0.98]">
                   {t('iWatered', lang)}
                 </button>
-                <button onClick={markWatered} title={t('rainNote', lang)}
+                <button onClick={() => addEvent('rain')} title={t('rainNote', lang)}
                   className="flex-1 rounded-xl border border-water/40 bg-card py-3 text-sm font-medium text-water-deep active:scale-[0.98]">
                   {t('itRained', lang)}
                 </button>
@@ -97,7 +136,7 @@ export function Dashboard({ field }: { field: FieldConfig }) {
             <div className="mt-3 grid grid-cols-2 gap-2 text-left text-sm">
               <div className="rounded-xl bg-wash px-3 py-2.5">
                 <p className="text-xs text-ink/50">{t('et0Label', lang)}</p>
-                <p className="font-medium">{formatNum(s.et0, lang)} {t('mmDay', lang)}</p>
+                <p className="font-medium">{formatNum(et0, lang)} {t('mmDay', lang)}</p>
               </div>
               <div className="rounded-xl bg-wash px-3 py-2.5">
                 <p className="text-xs text-ink/50">{t('kcLabel', lang)}</p>
@@ -144,7 +183,33 @@ export function Dashboard({ field }: { field: FieldConfig }) {
         </>
       )}
 
-      <p className="mt-6 text-center text-xs leading-relaxed text-ink/40">{t('methodology', lang)}</p>
+      {/* watering history */}
+      <section className="mt-5 rounded-2xl border border-line bg-card p-4">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-medium uppercase tracking-wide text-ink/50">{t('history', lang)}</p>
+          <button onClick={() => openReport(field, lang)}
+            className="rounded-full bg-water/10 px-3 py-1 text-xs font-medium text-water-deep">
+            📄 PDF
+          </button>
+        </div>
+        {log.length ? (
+          <ul className="mt-3 flex flex-col gap-1.5">
+            {log.map((e, i) => (
+              <li key={i} className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-2">
+                  <span aria-hidden>{e.type === 'rain' ? '🌧️' : '💧'}</span>
+                  {e.type === 'rain' ? t('typeRain', lang) : t('typeWatered', lang)}
+                </span>
+                <span className="text-ink/50">{formatDate(new Date(e.date), lang)}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-2 text-sm text-ink/50">{t('noHistory', lang)}</p>
+        )}
+      </section>
+
+      <p className="mt-4 text-center text-xs leading-relaxed text-ink/40">{t('methodology', lang)}</p>
     </div>
   );
 }

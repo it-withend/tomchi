@@ -6,6 +6,12 @@ export type Soil = 'sandy' | 'loam' | 'clay';
 // sandy soils hold less water -> water more often; clay holds more -> less often
 export const soilIntervalFactor: Record<Soil, number> = { sandy: 0.75, loam: 1, clay: 1.25 };
 
+export type WateringType = 'watered' | 'rain';
+export interface WateringEvent {
+  date: string; // ISO datetime
+  type: WateringType;
+}
+
 export interface FieldConfig {
   id: string;
   regionId: string;
@@ -13,7 +19,14 @@ export interface FieldConfig {
   areaHa: number;
   method: Method;
   soil: Soil;
-  lastWatered?: string; // ISO date of last watering or rain event
+  lastWatered?: string; // legacy single date (migrated into log)
+  log?: WateringEvent[];
+}
+
+/** Most recent watering/rain event date, from log or legacy field. */
+export function lastEventDate(cfg: FieldConfig): string | undefined {
+  const last = cfg.log?.[cfg.log.length - 1]?.date;
+  return last ?? cfg.lastWatered;
 }
 
 export interface DayStatus {
@@ -167,9 +180,10 @@ export function seasonTotals(cfg: FieldConfig) {
 export function nextWatering(cfg: FieldConfig, today = new Date()): { date: Date; daysLeft: number; overdue: boolean } | null {
   const s = dayStatus(cfg, today);
   if (!s.inSeason) return null;
-  const base = cfg.lastWatered ? new Date(cfg.lastWatered) : today;
+  const last = lastEventDate(cfg);
+  const base = last ? new Date(last) : today;
   const next = new Date(base);
-  next.setDate(next.getDate() + (cfg.lastWatered ? s.intervalDays : 0));
+  next.setDate(next.getDate() + (last ? s.intervalDays : 0));
   const t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   const n0 = new Date(next.getFullYear(), next.getMonth(), next.getDate());
   const daysLeft = Math.round((n0.getTime() - t0.getTime()) / 86400000);

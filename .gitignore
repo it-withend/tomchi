@@ -2,3 +2,9 @@ node_modules/
 dist/
 *.local
 .DS_Store
+
+# Secrets & bot runtime data — never commit
+.env
+**/.env
+bot/node_modules/
+bot/data/
