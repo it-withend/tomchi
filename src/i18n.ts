@@ -113,7 +113,11 @@ export const dict: Dict = {
   mapTitle: { uz: 'Viloyatlar bo‘yicha tejamkorlik', ru: 'Экономия по регионам' },
   nationalEmpty: { uz: 'Hali ma’lumot yo‘q — birinchi bo‘ling!', ru: 'Пока нет данных — станьте первым!' },
   nationalLoading: { uz: 'Yuklanmoqda…', ru: 'Загрузка…' },
-  mapLegend: { uz: 'Doira kattaligi — tejalgan suv hajmi', ru: 'Размер круга — объём сэкономленной воды' },
+  mapTapHint: { uz: 'Batafsil uchun viloyatni bosing', ru: 'Нажмите на регион для деталей' },
+  mapLegendLess: { uz: 'kam', ru: 'меньше' },
+  mapLegendMore: { uz: 'ko‘p', ru: 'больше' },
+  regionNoData: { uz: 'Hali ma’lumot yo‘q', ru: 'Пока нет данных' },
+  regionFields: { uz: 'dala', ru: 'полей' },
   // Soil
   stepSoil: { uz: 'Tuproq turi', ru: 'Тип почвы' },
   soil_sandy: { uz: 'Qumloq', ru: 'Песчаная' },
