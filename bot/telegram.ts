@@ -1,15 +1,16 @@
 // Minimal Telegram Bot API client over fetch (no SDK dependency).
-const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-if (!TOKEN) {
-  console.error('Missing TELEGRAM_BOT_TOKEN. Create bot/.env with TELEGRAM_BOT_TOKEN=...');
-  process.exit(1);
+// The token is read lazily so importing this module is side-effect free — safe
+// in a serverless function where process.exit() would kill the whole invocation.
+function api(): string {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  if (!token) throw new Error('Missing TELEGRAM_BOT_TOKEN');
+  return `https://api.telegram.org/bot${token}`;
 }
-const API = `https://api.telegram.org/bot${TOKEN}`;
 
 export interface InlineButton { text: string; callback_data: string }
 
 async function call(method: string, body: Record<string, unknown>) {
-  const res = await fetch(`${API}/${method}`, {
+  const res = await fetch(`${api()}/${method}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -17,6 +18,19 @@ async function call(method: string, body: Record<string, unknown>) {
   const json = await res.json();
   if (!json.ok) console.error(`Telegram ${method} failed:`, json.description);
   return json.result;
+}
+
+/** Point Telegram at a webhook URL (used by the Netlify deploy). */
+export function setWebhook(url: string, secret?: string) {
+  return call('setWebhook', {
+    url,
+    secret_token: secret,
+    allowed_updates: ['message', 'callback_query'],
+    drop_pending_updates: true,
+  });
+}
+export function deleteWebhook() {
+  return call('deleteWebhook', { drop_pending_updates: false });
 }
 
 export function getMe() {
@@ -54,7 +68,7 @@ export async function poll(onUpdate: (u: any) => void) {
   console.log('Bot polling started.');
   for (;;) {
     try {
-      const res = await fetch(`${API}/getUpdates?timeout=30&offset=${offset}`);
+      const res = await fetch(`${api()}/getUpdates?timeout=30&offset=${offset}`);
       const json = await res.json();
       if (json.ok) {
         for (const u of json.result) {

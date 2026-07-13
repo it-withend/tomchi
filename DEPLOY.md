@@ -41,23 +41,42 @@ runs on `/.netlify/functions/*` with the Groq key server-side.
 Supabase → Authentication → URL Configuration → add your `https://<name>.netlify.app`
 to **Site URL / Redirect URLs** (so anonymous auth works from the deployed site).
 
-## C. Keep the Telegram bot running (cloud)
+## C. Run the Telegram bot on Netlify (free, no separate host)
 
-The bot is a long-running Node process (`bot/`). Easiest free-ish host: **Railway**.
+The bot runs as a **webhook function** + a **scheduled function** on the same
+Netlify site — no always-on server, no Railway, no extra account.
 
-1. https://railway.app → **New Project → Deploy from GitHub repo** → `tomchi`.
-2. In the service **Settings**:
-   - **Root Directory**: `bot`
-   - **Start Command**: `npm start`
-3. **Variables** — add:
-   - `TELEGRAM_BOT_TOKEN` = your BotFather token
-   - `SUPABASE_URL` = `https://cgihysaztskxufwvtgja.supabase.co`
-   - `SUPABASE_SERVICE_ROLE_KEY` = your Supabase **secret** key (`sb_secret_…`)
-4. Deploy. The bot polls Telegram and sends the 07:00 Asia/Tashkent reminders.
+1. **Run the DB migration.** Supabase → **SQL Editor** → paste the contents of
+   `supabase/migrations/0002_bot_subscribers.sql` → **Run**. (Adds the
+   `bot_subscribers` table used when a farmer sets up a field inside the bot.)
+2. **Add bot env vars** in Netlify → Site configuration → Environment variables:
 
-> Alternatives: Render (Background Worker), Fly.io, or any always-on VPS.
+   | Key | Value |
+   |-----|-------|
+   | `TELEGRAM_BOT_TOKEN` | *(your BotFather token)* |
+   | `SUPABASE_URL` | `https://cgihysaztskxufwvtgja.supabase.co` |
+   | `SUPABASE_SERVICE_ROLE_KEY` | *(your Supabase `sb_secret_…` key)* |
+   | `TELEGRAM_WEBHOOK_SECRET` | *(any long random string)* |
+
+   `SUPABASE_SERVICE_ROLE_KEY` and `TELEGRAM_BOT_TOKEN` are server-side only —
+   they run in functions and are never shipped to the browser (only `VITE_*`
+   vars are). Do **not** prefix them with `VITE_`.
+3. **Deploys → Trigger deploy → Clear cache and deploy site** so the vars apply.
+4. **Register the webhook** (one time). Replace `<TOKEN>` and `<SECRET>`:
+
+   ```bash
+   curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://tomchiai.netlify.app/.netlify/functions/telegram&secret_token=<SECRET>&drop_pending_updates=true"
+   ```
+
+   You should get `{"ok":true,"result":true,...}`. The bot now replies instantly,
+   and the 07:00 Asia/Tashkent reminder fires from the scheduled function
+   (`tomchi-daily`, cron `0 2 * * *` UTC).
+
+> To go back to local testing later: `cd bot && npm start` (long-polling). Note
+> that setting a webhook disables polling — run `deleteWebhook` first, and never
+> run both at once (Telegram delivers updates to only one).
 
 ## Security reminder
 Rotate the keys you shared in chat once everything works:
-Supabase (Settings → API → rotate), Groq (delete/recreate key), BotFather (`/revoke`).
-Update them in Netlify/Railway env vars afterwards.
+Supabase (Settings → API → rotate), Groq (delete/recreate key), BotFather (`/revoke`),
+and the GitHub token. Update them in Netlify env vars afterwards.

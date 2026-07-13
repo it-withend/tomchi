@@ -1,4 +1,4 @@
-import type { Lang } from './store';
+import type { Lang } from './subscribers';
 
 type M = Record<string, { uz: string; ru: string }>;
 
