@@ -1,5 +1,5 @@
 import { t, formatNum, formatDate, type Lang } from '../i18n';
-import { getCrop, getRegion, seasonTotals, dayStatus, lastEventDate, type FieldConfig } from './irrigation';
+import { getCrop, getRegion, seasonTotals, dayStatus, lastEventDate, SOM_PER_M3, type FieldConfig } from './irrigation';
 
 const methodLabel: Record<string, string> = { furrow: 'furrow', sprinkler: 'sprinkler', drip: 'drip' };
 
@@ -12,8 +12,25 @@ export function openReport(field: FieldConfig, lang: Lang) {
   const log = [...(field.log ?? [])].reverse();
   const last = lastEventDate(field);
 
+  // per-event water accounting: volume applied at each watering (m³)
+  let totalApplied = 0;
+  let wateredCount = 0;
+  let rainCount = 0;
   const rows = log
-    .map((e) => `<tr><td>${formatDate(new Date(e.date), lang)}</td><td>${e.type === 'rain' ? t('typeRain', lang) : t('typeWatered', lang)}</td></tr>`)
+    .map((e) => {
+      const st = dayStatus(field, new Date(e.date));
+      let vol = '';
+      if (e.type === 'watered') {
+        wateredCount++;
+        const m3 = st.inSeason ? st.litersPerIrrigation / 1000 : 0;
+        totalApplied += m3;
+        vol = st.inSeason ? `${formatNum(m3, lang)} m³` : '—';
+      } else {
+        rainCount++;
+        vol = '🌧';
+      }
+      return `<tr><td>${formatDate(new Date(e.date), lang)}</td><td>${e.type === 'rain' ? t('typeRain', lang) : t('typeWatered', lang)}</td><td style="text-align:right">${vol}</td></tr>`;
+    })
     .join('');
 
   const html = `<!doctype html><html lang="${lang}"><head><meta charset="utf-8">
@@ -61,8 +78,16 @@ export function openReport(field: FieldConfig, lang: Lang) {
     <div><span>${t('waterSavedSeason', lang)} (${t('vsFlood', lang)})</span><b>${formatNum(tot.m3Saved, lang)} m³</b></div>
   </div>
 
+  <h2>${t('reportUsage', lang)}</h2>
+  <div class="grid">
+    <div><span>${t('reportWaterings', lang)}</span><b>${wateredCount}</b></div>
+    <div><span>${t('reportRains', lang)}</span><b>${rainCount}</b></div>
+    <div><span>${t('reportApplied', lang)}</span><b class="big">${formatNum(totalApplied, lang)} m³</b></div>
+    <div><span>${t('reportSavedMoney', lang)}</span><b>${formatNum(tot.m3Saved * SOM_PER_M3, lang)} ${t('som', lang)}</b></div>
+  </div>
+
   <h2>${t('history', lang)}</h2>
-  ${log.length ? `<table><thead><tr><th>${t('reportGenerated', lang)}</th><th>${t('typeWatered', lang)}</th></tr></thead><tbody>${rows}</tbody></table>` : `<p>${t('noHistory', lang)}</p>`}
+  ${log.length ? `<table><thead><tr><th>${t('reportDate', lang)}</th><th>${t('reportEvent', lang)}</th><th style="text-align:right">${t('reportVolume', lang)}</th></tr></thead><tbody>${rows}</tbody></table>` : `<p>${t('noHistory', lang)}</p>`}
   ${last ? `<p style="font-size:12px;color:#6b8b93">${t('lastWatered', lang)}: ${formatDate(new Date(last), lang)}</p>` : ''}
 
   <p class="foot">${t('methodology', lang)}<br>${t('reportGenerated', lang)}: ${formatDate(new Date(), lang)} · awards.gov.uz/pta</p>

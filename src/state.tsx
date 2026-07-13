@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { Lang } from './i18n';
-import type { FieldConfig } from './engine/irrigation';
+import type { FieldConfig, WateringType } from './engine/irrigation';
+import { supabaseEnabled, ensureSession } from './lib/supabase';
+import { pushField, pushEvent, removeFieldRemote } from './lib/sync';
 
 interface AppState {
   lang: Lang;
@@ -11,6 +13,8 @@ interface AppState {
   addField: (f: Omit<FieldConfig, 'id'>) => void;
   removeField: (id: string) => void;
   updateField: (id: string, patch: Partial<FieldConfig>) => void;
+  logWatering: (id: string, type: WateringType) => void;
+  syncEnabled: boolean;
   tutorialSeen: boolean;
   setTutorialSeen: (v: boolean) => void;
   adding: boolean;
@@ -64,6 +68,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }
     } catch { /* corrupted storage — start fresh */ }
     setLoaded(true);
+    if (supabaseEnabled) ensureSession(); // establish anon owner in the background
   }, []);
 
   useEffect(() => {
@@ -73,9 +78,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const addField = (f: Omit<FieldConfig, 'id'>) => {
     const id = 'f' + Date.now().toString(36);
-    setFields((fs) => [...fs, { ...f, id }]);
+    const field = { ...f, id };
+    setFields((fs) => [...fs, field]);
     setActiveFieldId(id);
     setAdding(false);
+    void pushField(field);
   };
 
   const removeField = (id: string) => {
@@ -84,10 +91,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (id === activeFieldId) setActiveFieldId(rest[0]?.id ?? '');
       return rest;
     });
+    void removeFieldRemote(id);
   };
 
   const updateField = (id: string, patch: Partial<FieldConfig>) =>
     setFields((fs) => fs.map((f) => (f.id === id ? { ...f, ...patch } : f)));
+
+  const logWatering = (id: string, type: WateringType) => {
+    const at = new Date().toISOString();
+    let updated: FieldConfig | undefined;
+    setFields((fs) => fs.map((f) => {
+      if (f.id !== id) return f;
+      updated = { ...f, log: [...(f.log ?? []), { date: at, type }] };
+      return updated;
+    }));
+    void pushEvent(id, type, at);
+    if (updated) void pushField(updated);
+  };
 
   const activeField = fields.find((f) => f.id === activeFieldId) ?? fields[0] ?? null;
 
@@ -95,7 +115,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <Ctx.Provider value={{
       lang, setLang, fields, activeField, setActiveFieldId,
-      addField, removeField, updateField,
+      addField, removeField, updateField, logWatering, syncEnabled: supabaseEnabled,
       tutorialSeen, setTutorialSeen, adding, setAdding,
     }}>
       {children}

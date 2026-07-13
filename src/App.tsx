@@ -7,6 +7,7 @@ import { CalendarView } from './components/CalendarView';
 import { Doctor } from './components/Doctor';
 import { Impact } from './components/Impact';
 import { Tutorial } from './components/Tutorial';
+import { Splash } from './components/Splash';
 
 type Tab = 'today' | 'calendar' | 'doctor' | 'impact';
 
@@ -21,10 +22,13 @@ export default function App() {
   const { lang, setLang, activeField, adding, tutorialSeen, setTutorialSeen } = useApp();
   const [tab, setTab] = useState<Tab>('today');
   const [showHelp, setShowHelp] = useState(false);
+  const [splash, setSplash] = useState(true);
 
   useEffect(() => {
     document.documentElement.lang = lang;
   }, [lang]);
+
+  if (splash) return <Splash onDone={() => setSplash(false)} />;
 
   if (!activeField || adding) return <div className="mx-auto max-w-md"><Onboarding key={adding ? 'add' : 'first'} /></div>;
 

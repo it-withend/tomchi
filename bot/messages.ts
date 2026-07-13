@@ -27,6 +27,11 @@ export const M: M = {
   waterLine: { uz: '💧 Bugun kerak: <b>{v} m³</b> ({mm} mm)', ru: '💧 Нужно сегодня: <b>{v} m³</b> ({mm} mm)' },
   stageLine: { uz: '🌱 Bosqich: {s}', ru: '🌱 Фаза: {s}' },
   intervalLine: { uz: '🔁 Har {n} kunda sug‘oring', ru: '🔁 Поливайте каждые {n} дней' },
+  linkUsage: { uz: 'Ilovadan olingan kodni yuboring: <code>/link 123456</code>', ru: 'Отправьте код из приложения: <code>/link 123456</code>' },
+  linkOk: { uz: '✅ Ilova ulandi! Endi dalangiz ma’lumotlari shu yerda. /today ni bosing.', ru: '✅ Приложение подключено! Теперь данные вашего поля здесь. Нажмите /today.' },
+  linkFail: { uz: '❌ Kod noto‘g‘ri yoki muddati o‘tgan. Ilovada yangi kod oling.', ru: '❌ Код неверный или истёк. Сгенерируйте новый код в приложении.' },
+  linkHint: { uz: '\n\n📱 Ilovada dala yaratgan bo‘lsangiz, uni ulash uchun: /link kod', ru: '\n\n📱 Если вы создали поле в приложении, подключите его: /link код' },
+  fieldHeader: { uz: '🌱 <b>{crop}</b> ({area} ga)', ru: '🌱 <b>{crop}</b> ({area} га)' },
 };
 
 export function m(key: string, lang: Lang, vars: Record<string, string | number> = {}): string {

@@ -4,8 +4,9 @@ import { getMe, sendMessage, editMessage, answerCallback, poll, type InlineButto
 import * as store from './store';
 import { m, stageName, methodName, soilName } from './messages';
 import { regions } from '../src/data/regions';
-import { crops } from '../src/data/crops';
-import { dayStatus, type FieldConfig } from '../src/engine/irrigation';
+import { crops, type Crop } from '../src/data/crops';
+import { dayStatus, getCrop, type FieldConfig } from '../src/engine/irrigation';
+import { supaEnabled, linkChat, isLinked, fieldsForChat, subscribedChats, setSubscribed } from './supa';
 
 type Lang = store.Lang;
 
@@ -43,18 +44,28 @@ async function rainSoon(regionId: string): Promise<boolean> {
   }
 }
 
-function dailyText(s: store.Subscriber, lang: Lang, rain: boolean): string | null {
-  const st = dayStatus(toField(s));
+function fieldBlock(field: FieldConfig, lang: Lang, withHeader: boolean): string | null {
+  const st = dayStatus(field);
   if (!st.inSeason) return null;
+  const crop: Crop = getCrop(field.cropId);
   const m3 = Math.round(st.litersPerDay / 100) / 10;
-  const lines = [
-    m('dailyHeader', lang),
+  const lines: string[] = [];
+  if (withHeader) lines.push(m('fieldHeader', lang, { crop: crop.name[lang], area: field.areaHa }));
+  lines.push(
     m('waterLine', lang, { v: m3, mm: Math.round(st.grossMm * 10) / 10 }),
     m('stageLine', lang, { s: stageName[st.stage]?.[lang] ?? st.stage }),
     m('intervalLine', lang, { n: st.intervalDays }),
-  ];
-  if (rain) lines.push('\n' + m('rainSkip', lang));
+  );
   return lines.join('\n');
+}
+
+/** Combined daily message for one or more fields. */
+function dailyMessage(fields: FieldConfig[], lang: Lang, rain: boolean): string | null {
+  const blocks = fields.map((f) => fieldBlock(f, lang, fields.length > 1)).filter(Boolean) as string[];
+  if (!blocks.length) return null;
+  const out = [m('dailyHeader', lang), '', blocks.join('\n\n')];
+  if (rain) out.push('\n' + m('rainSkip', lang));
+  return out.join('\n');
 }
 
 // ---- setup keyboards --------------------------------------------------------
@@ -87,22 +98,38 @@ async function onMessage(msg: any) {
 
   if (text.startsWith('/start')) {
     store.upsert(chatId, { step: 'lang' });
-    await sendMessage(chatId, m('welcome', lang), langKb);
+    await sendMessage(chatId, m('welcome', lang) + (supaEnabled ? m('linkHint', lang) : ''), langKb);
     return;
   }
   if (text.startsWith('/help')) {
     await sendMessage(chatId, m('help', lang));
     return;
   }
+  if (text.startsWith('/link')) {
+    const code = text.split(/\s+/)[1]?.trim();
+    if (!code || !/^\d{6}$/.test(code)) { await sendMessage(chatId, m('linkUsage', lang)); return; }
+    const ok = await linkChat(code, chatId, lang);
+    await sendMessage(chatId, m(ok ? 'linkOk' : 'linkFail', lang));
+    return;
+  }
   if (text.startsWith('/stop')) {
     store.upsert(chatId, { subscribed: false });
+    await setSubscribed(chatId, false);
     await sendMessage(chatId, m('stopped', lang));
     return;
   }
   if (text.startsWith('/today')) {
+    // Prefer fields configured in the app (linked via code), else the bot's own setup.
+    if (await isLinked(chatId)) {
+      const fields = await fieldsForChat(chatId);
+      const rain = fields[0] ? await rainSoon(fields[0].regionId) : false;
+      const t = dailyMessage(fields, lang, rain);
+      await sendMessage(chatId, t ?? m('offSeason', lang));
+      return;
+    }
     if (!sub || sub.step !== 'done') { await sendMessage(chatId, m('needSetup', lang)); return; }
     const rain = await rainSoon(sub.regionId!);
-    const t = dailyText(sub, lang, rain);
+    const t = dailyMessage([toField(sub)], lang, rain);
     await sendMessage(chatId, t ?? m('offSeason', lang));
     return;
   }
@@ -144,7 +171,7 @@ async function onCallback(cb: any) {
       const done = store.upsert(chatId, { soil: value as store.Soil, step: 'done', subscribed: true });
       await editMessage(chatId, messageId, m('done', lang));
       const rain = await rainSoon(done.regionId!);
-      const t = dailyText(done, lang, rain);
+      const t = dailyMessage([toField(done)], lang, rain);
       if (t) await sendMessage(chatId, t);
       break;
     }
@@ -154,13 +181,25 @@ async function onCallback(cb: any) {
 // ---- daily reminder ---------------------------------------------------------
 
 async function sendDailyReminders() {
-  const subs = store.all().filter((s) => s.subscribed && s.step === 'done');
-  console.log(`Sending daily reminders to ${subs.length} subscribers…`);
+  const linkedChatIds = new Set<number>();
+
+  // 1) Fields configured in the web app and linked via a pairing code.
+  const linked = await subscribedChats();
+  for (const c of linked) {
+    linkedChatIds.add(c.chatId);
+    const rain = c.fields[0] ? await rainSoon(c.fields[0].regionId) : false;
+    const t = dailyMessage(c.fields, c.lang as Lang, rain);
+    if (t) await sendMessage(c.chatId, t);
+  }
+
+  // 2) Chats that set up directly in the bot (and aren't already linked).
+  const subs = store.all().filter((s) => s.subscribed && s.step === 'done' && !linkedChatIds.has(s.chatId));
   for (const s of subs) {
     const rain = await rainSoon(s.regionId!);
-    const t = dailyText(s, s.lang, rain);
+    const t = dailyMessage([toField(s)], s.lang, rain);
     if (t) await sendMessage(s.chatId, t);
   }
+  console.log(`Daily reminders sent: ${linked.length} linked + ${subs.length} local.`);
 }
 
 // ---- boot -------------------------------------------------------------------

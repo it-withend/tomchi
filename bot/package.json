@@ -9,6 +9,7 @@
     "dev": "tsx watch bot.ts"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.110.2",
     "dotenv": "^16.4.5",
     "node-cron": "^3.0.3"
   },

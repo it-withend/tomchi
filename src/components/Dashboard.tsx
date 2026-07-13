@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { useApp } from '../state';
 import { t, fmt, formatNum, formatDate } from '../i18n';
+import { ConnectTelegram } from './ConnectTelegram';
 import { dayStatus, getCrop, getRegion, nextWatering, lastEventDate, type FieldConfig } from '../engine/irrigation';
 import { methodEfficiency } from '../data/crops';
 import { useForecast } from '../useForecast';
@@ -8,7 +10,8 @@ import { openReport } from '../engine/report';
 import { DropGauge } from './DropGauge';
 
 export function Dashboard({ field }: { field: FieldConfig }) {
-  const { lang, fields, setActiveFieldId, setAdding, updateField, removeField } = useApp();
+  const { lang, fields, setActiveFieldId, setAdding, logWatering, removeField, syncEnabled } = useApp();
+  const [showConnect, setShowConnect] = useState(false);
   const s = dayStatus(field);
   const crop = getCrop(field.cropId);
   const region = getRegion(field.regionId);
@@ -33,8 +36,7 @@ export function Dashboard({ field }: { field: FieldConfig }) {
   const last = lastEventDate(field);
   const log = [...(field.log ?? [])].reverse().slice(0, 6);
 
-  const addEvent = (type: 'watered' | 'rain') =>
-    updateField(field.id, { log: [...(field.log ?? []), { date: new Date().toISOString(), type }] });
+  const addEvent = (type: 'watered' | 'rain') => logWatering(field.id, type);
 
   const rainTodayHeavy = today && today.rainMm >= RAIN_SKIP_MM;
 
@@ -209,7 +211,22 @@ export function Dashboard({ field }: { field: FieldConfig }) {
         )}
       </section>
 
+      {/* Telegram reminders */}
+      {syncEnabled && (
+        <button onClick={() => setShowConnect(true)}
+          className="mt-5 flex w-full items-center gap-3 rounded-2xl border border-water/30 bg-water/5 p-4 text-left">
+          <span className="text-2xl" aria-hidden>✈️</span>
+          <span className="flex-1">
+            <span className="block text-sm font-medium text-water-deep">{t('connectTg', lang)}</span>
+            <span className="block text-xs text-ink/60">{t('connectTgDesc', lang)}</span>
+          </span>
+          <span className="text-water-deep" aria-hidden>›</span>
+        </button>
+      )}
+
       <p className="mt-4 text-center text-xs leading-relaxed text-ink/40">{t('methodology', lang)}</p>
+
+      {showConnect && <ConnectTelegram onClose={() => setShowConnect(false)} />}
     </div>
   );
 }
