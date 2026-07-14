@@ -9,21 +9,26 @@ import { fetchNationalImpact, type NationalImpact as Data } from '../lib/nationa
 const nameOf = (id: string, lang: 'uz' | 'ru') =>
   regions.find((r) => r.id === id)?.name[lang] ?? id;
 
-/** Animated count-up to `target` over ~1.2s. */
+/** Animated count-up to `target` over ~1.2s. Falls back to the final value if
+ *  requestAnimationFrame is throttled (e.g. a backgrounded tab), so the number
+ *  never gets stuck at 0. */
 function useCountUp(target: number, run: boolean) {
   const [value, setValue] = useState(0);
   useEffect(() => {
     if (!run) { setValue(0); return; }
     let raf = 0;
+    let done = false;
     const start = performance.now();
     const dur = 1200;
     const tick = (now: number) => {
       const p = Math.min(1, (now - start) / dur);
       setValue(target * (1 - Math.pow(1 - p, 3))); // ease-out cubic
       if (p < 1) raf = requestAnimationFrame(tick);
+      else done = true;
     };
     raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    const fallback = setTimeout(() => { if (!done) setValue(target); }, dur + 300);
+    return () => { cancelAnimationFrame(raf); clearTimeout(fallback); };
   }, [target, run]);
   return value;
 }
