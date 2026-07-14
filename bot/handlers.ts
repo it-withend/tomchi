@@ -56,18 +56,49 @@ function toField(s: Subscriber): FieldConfig {
   };
 }
 
-// Open-Meteo rain check for the next 3 days (bot-side, no localStorage).
-async function rainSoon(regionId: string): Promise<boolean> {
-  const r = regions.find((x) => x.id === regionId);
-  if (!r) return false;
-  try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${r.lat}&longitude=${r.lon}&daily=precipitation_sum&forecast_days=3&timezone=auto`;
-    const res = await fetch(url);
-    const j = await res.json();
-    return (j.daily?.precipitation_sum ?? []).some((mm: number) => mm >= 5);
-  } catch {
-    return false;
-  }
+// Open-Meteo forecast checks for the next 3 days (bot-side, no localStorage).
+// One fetch per region per run — many chats share a region, so promises are memoised.
+export interface WeatherWarn { rain: boolean; frost: boolean; heat: boolean; wind: boolean }
+const NO_WARN: WeatherWarn = { rain: false, frost: false, heat: false, wind: false };
+const warnCache = new Map<string, Promise<WeatherWarn>>();
+
+function weatherWarn(regionId: string): Promise<WeatherWarn> {
+  const cached = warnCache.get(regionId);
+  if (cached) return cached;
+  const p = (async (): Promise<WeatherWarn> => {
+    const r = regions.find((x) => x.id === regionId);
+    if (!r) return NO_WARN;
+    try {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${r.lat}&longitude=${r.lon}` +
+        `&daily=precipitation_sum,temperature_2m_min,temperature_2m_max,wind_speed_10m_max&forecast_days=3&timezone=auto`;
+      const res = await fetch(url);
+      const j = await res.json();
+      const d = j.daily ?? {};
+      return {
+        rain: (d.precipitation_sum ?? []).some((mm: number) => mm >= 5),
+        // Frost bites overnight — check the next two nights.
+        frost: (d.temperature_2m_min ?? []).slice(0, 2).some((t: number) => t <= 1),
+        heat: (d.temperature_2m_max ?? []).some((t: number) => t >= 39),
+        wind: (d.wind_speed_10m_max ?? []).some((v: number) => v >= 40), // km/h
+      };
+    } catch {
+      return NO_WARN;
+    }
+  })();
+  warnCache.set(regionId, p);
+  // Memoise only within one invocation burst; expire quickly so the daily cron
+  // (warm container) doesn't reuse yesterday's forecast.
+  setTimeout(() => warnCache.delete(regionId), 5 * 60 * 1000);
+  return p;
+}
+
+/** Weather warning lines (frost/heat/wind) for the day's message. */
+function warnLines(warn: WeatherWarn, lang: Lang): string[] {
+  const out: string[] = [];
+  if (warn.frost) out.push(m('frostAlert', lang));
+  if (warn.heat) out.push(m('heatAlert', lang));
+  if (warn.wind) out.push(m('windAlert', lang));
+  return out;
 }
 
 function fieldBlock(field: FieldConfig, lang: Lang, withHeader: boolean): string | null {
@@ -91,24 +122,25 @@ function fieldBlock(field: FieldConfig, lang: Lang, withHeader: boolean): string
   return lines.join('\n');
 }
 
-function dailyMessage(fields: FieldConfig[], lang: Lang, rain: boolean): string | null {
+function dailyMessage(fields: FieldConfig[], lang: Lang, warn: WeatherWarn): string | null {
   if (!fields.length) return null;
-  const alerts = fields.map((f) => stageAlert(f, lang)).filter(Boolean) as string[];
+  const alerts = [...warnLines(warn, lang), ...(fields.map((f) => stageAlert(f, lang)).filter(Boolean) as string[])];
   const blocks = fields.map((f) => fieldBlock(f, lang, fields.length > 1)).filter(Boolean) as string[];
   const out: string[] = [];
   if (alerts.length) out.push(alerts.join('\n\n'), '');
   out.push(m('dailyHeader', lang), '', blocks.join('\n\n'));
-  if (rain) out.push('\n' + m('rainSkip', lang));
+  if (warn.rain) out.push('\n' + m('rainSkip', lang));
   return out.join('\n');
 }
 
 /** One field's block with its header (for the per-field detail view). */
-function singleFieldMessage(f: FieldConfig, lang: Lang, rain: boolean): string {
-  const alert = stageAlert(f, lang);
+function singleFieldMessage(f: FieldConfig, lang: Lang, warn: WeatherWarn): string {
+  const stage = stageAlert(f, lang);
+  const alerts = [...warnLines(warn, lang), ...(stage ? [stage] : [])];
   const out: string[] = [];
-  if (alert) out.push(alert, '');
+  if (alerts.length) out.push(alerts.join('\n\n'), '');
   out.push(fieldBlock(f, lang, true) ?? '');
-  if (rain) out.push('\n' + m('rainSkip', lang));
+  if (warn.rain) out.push('\n' + m('rainSkip', lang));
   return out.join('\n');
 }
 
@@ -201,8 +233,8 @@ function menuKb(lang: Lang): InlineButton[][] {
 async function replyToday(chatId: number, lang: Lang, sub?: Subscriber) {
   const fields = await resolveFields(chatId, sub);
   if (!fields.length) { await sendMessage(chatId, m('noFields', lang)); return; }
-  const rain = await rainSoon(fields[0].regionId);
-  await sendMessage(chatId, dailyMessage(fields, lang, rain) ?? m('noFields', lang), menuKb(lang));
+  const warn = await weatherWarn(fields[0].regionId);
+  await sendMessage(chatId, dailyMessage(fields, lang, warn) ?? m('noFields', lang), menuKb(lang));
 }
 async function replyCalendar(chatId: number, lang: Lang, sub?: Subscriber) {
   const fields = await resolveFields(chatId, sub);
@@ -238,7 +270,7 @@ async function replyFieldDetail(chatId: number, lang: Lang, fieldId: string, sub
   const fields = await resolveFields(chatId, sub);
   const f = fields.find((x) => x.id === fieldId) ?? fields[0];
   if (!f) { await sendMessage(chatId, m('noFields', lang)); return; }
-  const rain = await rainSoon(f.regionId);
+  const warn = await weatherWarn(f.regionId);
   const kb: InlineButton[][] = [
     [
       { text: lang === 'uz' ? '📅 Taqvim' : '📅 Календарь', callback_data: `fc:${f.id}` },
@@ -246,7 +278,7 @@ async function replyFieldDetail(chatId: number, lang: Lang, fieldId: string, sub
     ],
     ...(fields.length > 1 ? [[{ text: m('backFields', lang), callback_data: 'cmd:fields' }]] : []),
   ];
-  await sendMessage(chatId, singleFieldMessage(f, lang, rain), kb);
+  await sendMessage(chatId, singleFieldMessage(f, lang, warn), kb);
 }
 
 async function replyFieldView(chatId: number, lang: Lang, fieldId: string, view: 'cal' | 'sav', sub?: Subscriber) {
@@ -372,16 +404,16 @@ export async function sendDailyReminders(): Promise<void> {
   const linked = await subscribedChats();
   for (const c of linked) {
     linkedChatIds.add(c.chatId);
-    const rain = c.fields[0] ? await rainSoon(c.fields[0].regionId) : false;
-    const t = dailyMessage(c.fields, c.lang as Lang, rain);
+    const warn = c.fields[0] ? await weatherWarn(c.fields[0].regionId) : NO_WARN;
+    const t = dailyMessage(c.fields, c.lang as Lang, warn);
     if (t) await sendMessage(c.chatId, t);
   }
 
   // 2) Chats that set up directly in the bot (and aren't already linked).
   const subs = (await allSubscribed()).filter((s) => !linkedChatIds.has(s.chatId));
   for (const s of subs) {
-    const rain = await rainSoon(s.regionId!);
-    const t = dailyMessage([toField(s)], s.lang, rain);
+    const warn = await weatherWarn(s.regionId!);
+    const t = dailyMessage([toField(s)], s.lang, warn);
     if (t) await sendMessage(s.chatId, t);
   }
   console.log(`Daily reminders sent: ${linked.length} linked + ${subs.length} local.`);

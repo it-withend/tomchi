@@ -76,9 +76,9 @@ function isoDay(d: Date) {
 
 interface Bucket { date: string; mean: number; valid: number }
 
-async function latestClearBucket(
+async function clearBuckets(
   token: string, bbox: number[], fromISO: string, toISO: string,
-): Promise<Bucket | null> {
+): Promise<Bucket[]> {
   const body = {
     input: {
       bounds: { bbox, properties: { crs: 'http://www.opengis.net/def/crs/EPSG/0/4326' } },
@@ -111,11 +111,10 @@ async function latestClearBucket(
     maxValid = Math.max(maxValid, valid);
     buckets.push({ date: b.interval.from.slice(0, 10), mean: st.mean, valid });
   }
-  // Prefer the most recent scene that actually covers the plot (≥40% valid
-  // pixels), so a mostly-cloudy pass doesn't set a misleading score.
+  // Keep only scenes that actually cover the plot (≥40% valid pixels), so a
+  // mostly-cloudy pass doesn't produce a misleading score.
   const good = buckets.filter((b) => b.valid >= 0.4 * maxValid);
-  const pick = (good.length ? good : buckets).at(-1);
-  return pick ?? null;
+  return good.length ? good : buckets;
 }
 
 async function ndviImage(token: string, bbox: number[], fromISO: string, toISO: string): Promise<string | null> {
@@ -160,11 +159,12 @@ export default async (req: Request): Promise<Response> => {
     const token = await getToken(id, secret);
     const bbox = bboxAround(lat, lng, ha);
     const now = new Date();
-    const from = new Date(now.getTime() - 75 * 864e5);
+    const from = new Date(now.getTime() - 90 * 864e5); // ~a season's worth of passes
     const fromISO = from.toISOString();
     const toISO = now.toISOString();
 
-    const bucket = await latestClearBucket(token, bbox as number[], fromISO, toISO);
+    const buckets = await clearBuckets(token, bbox as number[], fromISO, toISO);
+    const bucket = buckets.at(-1) ?? null;
     // Centre the picture on the clear scene we scored (± a few days), else fall
     // back to the whole window's least-cloudy mosaic.
     let imgFrom = fromISO, imgTo = toISO;
@@ -175,13 +175,15 @@ export default async (req: Request): Promise<Response> => {
     }
     const img = await ndviImage(token, bbox as number[], imgFrom, imgTo);
 
-    const mean = bucket?.mean ?? null;
     // Map NDVI 0.15 → 0 %, 0.80 → 100 %.
-    const health = mean == null ? null : Math.max(0, Math.min(100, Math.round(((mean - 0.15) / 0.65) * 100)));
+    const toHealth = (m: number) => Math.max(0, Math.min(100, Math.round(((m - 0.15) / 0.65) * 100)));
+    const mean = bucket?.mean ?? null;
+    const health = mean == null ? null : toHealth(mean);
     const status = mean == null ? 'nodata' : mean >= 0.6 ? 'healthy' : mean >= 0.4 ? 'moderate' : 'stressed';
+    const history = buckets.map((b) => ({ date: b.date, health: toHealth(b.mean) }));
 
     return new Response(
-      JSON.stringify({ ok: true, img, meanNdvi: mean, health, status, date: bucket?.date ?? null }),
+      JSON.stringify({ ok: true, img, meanNdvi: mean, health, status, date: bucket?.date ?? null, history }),
       { headers: cors },
     );
   } catch (e: any) {

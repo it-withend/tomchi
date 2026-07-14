@@ -10,6 +10,7 @@ export interface Ndvi {
   health: number | null; // 0..100
   status: 'healthy' | 'moderate' | 'stressed' | 'nodata';
   date: string | null; // YYYY-MM-DD of the scene
+  history?: { date: string; health: number }[]; // season trend, oldest first
 }
 
 const DAY = 86_400_000;

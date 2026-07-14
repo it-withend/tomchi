@@ -7,6 +7,41 @@ import { Icon } from './Icon';
 
 const FieldMap = lazy(() => import('./FieldMap'));
 
+/** Season NDVI trend as a tiny inline SVG line chart (no chart library). */
+function HistorySpark({ history, lang }: { history: { date: string; health: number }[]; lang: 'uz' | 'ru' }) {
+  const W = 260, H = 56, PAD = 4;
+  const xs = history.map((_, i) => PAD + (i * (W - 2 * PAD)) / (history.length - 1));
+  const ys = history.map((p) => PAD + (1 - p.health / 100) * (H - 2 * PAD));
+  const line = xs.map((x, i) => `${i ? 'L' : 'M'}${x.toFixed(1)},${ys[i].toFixed(1)}`).join(' ');
+  const area = `${line} L${xs[xs.length - 1].toFixed(1)},${H} L${xs[0].toFixed(1)},${H} Z`;
+  // Trend: average of the last two scenes vs the first two.
+  const first = (history[0].health + history[1].health) / 2;
+  const last = (history[history.length - 1].health + history[history.length - 2].health) / 2;
+  const trend = last - first;
+  const fmtD = (iso: string) => formatDate(new Date(iso), lang);
+  return (
+    <div className="mt-4">
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-ink/50">{t('satHistory', lang)}</p>
+        {Math.abs(trend) >= 5 && (
+          <p className={`text-[11px] font-medium ${trend > 0 ? 'text-leaf' : 'text-clay'}`}>
+            {t(trend > 0 ? 'satHistoryUp' : 'satHistoryDown', lang)}
+          </p>
+        )}
+      </div>
+      <svg viewBox={`0 0 ${W} ${H}`} className="mt-1.5 h-14 w-full" role="img" aria-label={t('satHistory', lang)}>
+        <path d={area} fill="var(--color-leaf)" opacity="0.12" />
+        <path d={line} fill="none" stroke="var(--color-leaf)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx={xs[xs.length - 1]} cy={ys[ys.length - 1]} r="3" fill="var(--color-leaf)" />
+      </svg>
+      <div className="flex justify-between text-[10px] text-ink/40">
+        <span>{fmtD(history[0].date)}</span>
+        <span>{fmtD(history[history.length - 1].date)}</span>
+      </div>
+    </div>
+  );
+}
+
 const STATUS = {
   healthy: { key: 'satHealthy', tip: 'satHealthyTip', cls: 'text-leaf', bg: 'bg-leaf-soft' },
   moderate: { key: 'satModerate', tip: 'satModerateTip', cls: 'text-clay', bg: 'bg-clay-soft' },
@@ -122,6 +157,11 @@ export function FieldNdvi({ field }: { field: FieldConfig }) {
               </div>
               {/* plain-language "what to do" */}
               <p className="mt-2.5 text-sm leading-snug text-ink/70">{t(STATUS[data.status].tip, lang)}</p>
+
+              {/* season trend sparkline */}
+              {data.history && data.history.length >= 3 && (
+                <HistorySpark history={data.history} lang={lang} />
+              )}
             </div>
           ) : (
             !loading && (

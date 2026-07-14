@@ -59,6 +59,19 @@ export const M: M = {
   backFields: { uz: '◀ Dalalarga', ru: '◀ К полям' },
   stageChanged: { uz: '📢 <b>{crop}</b>: yangi bosqich — {stage}', ru: '📢 <b>{crop}</b>: новая фаза — {stage}' },
   fertilizerNow: { uz: '🌿 Oziqlantirish: {text}', ru: '🌿 Подкормка: {text}' },
+  // Weather alerts (frost / heat / wind, next 3 days)
+  frostAlert: {
+    uz: '🥶 <b>Sovuq xavfi!</b> Kechasi harorat 0°C atrofida. Ko‘chat va nihollarni yoping, imkon bo‘lsa kechqurun sug‘oring — nam tuproq issiqni saqlaydi.',
+    ru: '🥶 <b>Опасность заморозков!</b> Ночью около 0°C. Укройте рассаду и молодые растения; по возможности полейте вечером — влажная почва держит тепло.',
+  },
+  heatAlert: {
+    uz: '🌡️ <b>Jazirama keladi!</b> Yaqin kunlarda +39°C dan yuqori. Erta tongda yoki kechqurun sug‘oring, suv me’yorini ~10% oshiring.',
+    ru: '🌡️ <b>Идёт жара!</b> В ближайшие дни выше +39°C. Поливайте рано утром или вечером и увеличьте норму примерно на 10%.',
+  },
+  windAlert: {
+    uz: '💨 <b>Kuchli shamol kutilmoqda.</b> Purkash (dori sepish) ishlarini qoldiring — dori shamolda uchib ketadi.',
+    ru: '💨 <b>Ожидается сильный ветер.</b> Отложите опрыскивание — препарат снесёт ветром.',
+  },
 };
 
 export const monthShort: Record<string, string[]> = {

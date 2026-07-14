@@ -325,6 +325,9 @@ export const dict: Dict = {
   satLegendLow: { uz: 'Bo‘sh / stress', ru: 'Голая / стресс' },
   satLegendHigh: { uz: 'Zich o‘simlik', ru: 'Густая зелень' },
   satLoading: { uz: 'Sun’iy yo‘ldosh ma’lumoti yuklanmoqda…', ru: 'Загружаем данные спутника…' },
+  satHistory: { uz: 'Mavsum dinamikasi', ru: 'Динамика за сезон' },
+  satHistoryUp: { uz: 'Dala yaxshilanmoqda 📈', ru: 'Поле идёт на поправку 📈' },
+  satHistoryDown: { uz: 'Holat pasaymoqda — e’tibor bering', ru: 'Состояние снижается — присмотритесь' },
   satError: { uz: 'Hozircha ma’lumot yo‘q. Keyinroq urinib ko‘ring.', ru: 'Данные пока недоступны. Попробуйте позже.' },
   satRefresh: { uz: 'Yangilash', ru: 'Обновить' },
   // Map picker
