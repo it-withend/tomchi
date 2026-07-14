@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useApp } from '../state';
 import { t, fmt, formatNum } from '../i18n';
 import { regions } from '../data/regions';
-import { getCrop } from '../engine/irrigation';
 import { Icon } from './Icon';
 import { uzShapes, UZ_W, UZ_H } from '../data/uzGeo';
 import { fetchNationalImpact, type NationalImpact as Data } from '../lib/nationalImpact';
@@ -38,7 +37,7 @@ function fillFor(saved: number, max: number): string {
 }
 
 export function NationalImpact() {
-  const { lang } = useApp();
+  const { lang, activeField } = useApp();
   const [data, setData] = useState<Data | null>(null);
   const [ready, setReady] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
@@ -164,33 +163,37 @@ export function NationalImpact() {
         </div>
       </div>
 
-      {/* Leaderboard — most water-thrifty farmers */}
-      {dataReady && data!.top.length > 0 && (
+      {/* Regions comparison — which region saves the most water */}
+      {dataReady && Object.values(byRegion).some((v) => v.saved > 0) && (
         <div className="mt-8">
           <div className="mb-1 flex items-center gap-2">
-            <Icon name="trophy" size={20} className="text-clay" />
-            <h3 className="font-display text-lg font-medium text-ink">{t('leaderTitle', lang)}</h3>
+            <Icon name="chart" size={20} className="text-water-deep" />
+            <h3 className="font-display text-lg font-medium text-ink">{t('regionsRankTitle', lang)}</h3>
           </div>
-          <p className="mb-4 text-sm text-ink/60">{t('leaderSub', lang)}</p>
-          <ol className="divide-y divide-line overflow-hidden rounded-3xl border border-line bg-card">
-            {data!.top.map((e, i) => {
-              const crop = getCrop(e.cropId);
-              const medal = ['bg-[#eab308] text-white', 'bg-[#94a3b8] text-white', 'bg-[#c17a3a] text-white'][i] ?? 'bg-wash text-ink/50';
-              return (
-                <li key={i} className={`flex items-center gap-3 px-4 py-3 ${e.you ? 'bg-water/10' : ''}`}>
-                  <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-sm font-bold ${medal}`}>{i + 1}</span>
-                  <span className="min-w-0 flex-1">
-                    <span className="flex items-center gap-1.5 text-sm font-medium text-ink">
-                      {nameOf(e.regionId, lang)}
-                      {e.you && <span className="rounded-full bg-water px-2 py-0.5 text-[10px] font-medium text-white">{t('leaderYou', lang)}</span>}
+          <p className="mb-4 text-sm text-ink/60">{t('regionsRankSub', lang)}</p>
+          <div className="space-y-2.5 rounded-3xl border border-line bg-card p-4">
+            {Object.entries(byRegion)
+              .filter(([, v]) => v.saved > 0)
+              .sort((a, b) => b[1].saved - a[1].saved)
+              .slice(0, 8)
+              .map(([id, v], i, arr) => {
+                const max = arr[0][1].saved || 1;
+                const you = activeField?.regionId === id;
+                return (
+                  <div key={id} className="flex items-center gap-2.5">
+                    <span className="w-4 shrink-0 text-right text-xs font-medium text-ink/40">{i + 1}</span>
+                    <span className={`w-[5.5rem] shrink-0 truncate text-sm ${you ? 'font-semibold text-water-deep' : 'text-ink'}`}>
+                      {nameOf(id, lang)}
                     </span>
-                    <span className="block text-xs text-ink/50">{crop.emoji} {crop.name[lang]}</span>
-                  </span>
-                  <span className="shrink-0 text-sm font-semibold tabular-nums text-water-deep">{formatNum(e.saved, lang)} m³</span>
-                </li>
-              );
-            })}
-          </ol>
+                    <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-wash">
+                      <div className={`h-full rounded-full ${you ? 'bg-water-deep' : 'bg-water'}`} style={{ width: `${Math.max(6, (v.saved / max) * 100)}%` }} />
+                    </div>
+                    <span className="w-14 shrink-0 text-right text-xs tabular-nums text-ink/60">{formatNum(v.saved, lang)}</span>
+                    {you && <span className="shrink-0 rounded-full bg-water px-1.5 py-0.5 text-[9px] font-medium text-white">{t('yourRegion', lang)}</span>}
+                  </div>
+                );
+              })}
+          </div>
         </div>
       )}
     </section>

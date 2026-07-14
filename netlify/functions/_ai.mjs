@@ -27,6 +27,18 @@ Structure your answer with short labeled sections:
 Keep it under 180 words. If a photo is unclear or symptoms are ambiguous, say what extra detail is needed. Do not invent certainty; add a short note to confirm with a local agronomist.`;
 }
 
+// Conversational agronomist for the ongoing chat (follow-up questions, not a
+// one-shot disease form). Stays practical and short; answers in the farmer's language.
+export function chatSystemPrompt(cropId, lang) {
+  const crop = CROP_NAMES[cropId] || cropId || 'a crop';
+  const language = lang === 'ru' ? 'Russian' : 'Uzbek (Latin script)';
+  return `You are Tomchi's friendly, experienced agronomist for smallholder farmers in Uzbekistan (Central Asian irrigated agriculture).
+The farmer mainly grows: ${crop}, but may ask about anything on their farm — irrigation, fertiliser, pests, diseases, planting, harvest, soil.
+Answer ONLY in ${language}. Be warm, concrete and practical. Prefer short paragraphs or a few bullet points over long essays.
+Name affordable inputs/treatments available in Uzbekistan when relevant. If a photo is unclear, say what extra detail would help.
+Keep most answers under 130 words unless the farmer asks for detail. Don't invent certainty; suggest confirming with a local agronomist for serious cases.`;
+}
+
 export async function chat(model, messages) {
   const key = process.env.AI_API_KEY;
   if (!key) throw new Error('AI_API_KEY not set');

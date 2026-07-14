@@ -9,6 +9,7 @@ import { dayFrom, nextRainDay, RAIN_SKIP_MM } from '../engine/weather';
 import { openReport } from '../engine/report';
 import { DropGauge } from './DropGauge';
 import { Icon } from './Icon';
+import { CropPrices } from './CropPrices';
 
 export function Dashboard({ field }: { field: FieldConfig }) {
   const { lang, fields, setActiveFieldId, setAdding, logWatering, removeField, syncEnabled } = useApp();
@@ -225,7 +226,9 @@ export function Dashboard({ field }: { field: FieldConfig }) {
         </button>
       )}
 
-      <p className="mt-4 text-center text-xs leading-relaxed text-ink/40">{t('methodology', lang)}</p>
+      <CropPrices field={field} />
+
+      <p className="mt-8 text-center text-xs leading-relaxed text-ink/40">{t('methodology', lang)}</p>
 
       {showConnect && <ConnectTelegram onClose={() => setShowConnect(false)} />}
     </div>

@@ -27,3 +27,10 @@ export function diagnoseText(cropId: string, symptoms: string, lang: Lang): Prom
 export function diagnosePhoto(cropId: string, imageBase64: string, lang: Lang): Promise<string> {
   return callFn('diagnose-photo', { cropId, image: imageBase64, lang });
 }
+
+export interface ChatMsg { role: 'user' | 'assistant'; text: string; image?: string }
+
+/** Conversational agronomist: sends recent history + optional photo, gets a reply. */
+export function chatAsk(cropId: string, messages: ChatMsg[], lang: Lang, image?: string): Promise<string> {
+  return callFn('chat', { cropId, lang, messages: messages.map((m) => ({ role: m.role, text: m.text })), image });
+}

@@ -6,17 +6,15 @@ import { Dashboard } from './components/Dashboard';
 import { CalendarView } from './components/CalendarView';
 import { Doctor } from './components/Doctor';
 import { Impact } from './components/Impact';
-import { AiAgronom } from './components/AiAgronom';
 import { Tutorial } from './components/Tutorial';
 import { Splash } from './components/Splash';
 import { Icon, type IconName } from './components/Icon';
 
-type Tab = 'today' | 'calendar' | 'doctor' | 'agronom' | 'impact';
+type Tab = 'today' | 'calendar' | 'agronom' | 'impact';
 
 const tabs: { id: Tab; labelKey: string; icon: IconName }[] = [
   { id: 'today', labelKey: 'tabToday', icon: 'drop' },
   { id: 'calendar', labelKey: 'tabCalendar', icon: 'calendar' },
-  { id: 'doctor', labelKey: 'tabDoctor', icon: 'diagnosis' },
   { id: 'agronom', labelKey: 'tabAgronom', icon: 'sparkles' },
   { id: 'impact', labelKey: 'tabImpact', icon: 'waves' },
 ];
@@ -67,8 +65,7 @@ export default function App() {
       <main>
         {tab === 'today' && <Dashboard field={activeField} />}
         {tab === 'calendar' && <CalendarView field={activeField} />}
-        {tab === 'doctor' && <Doctor key={activeField.id + activeField.cropId} field={activeField} />}
-        {tab === 'agronom' && <AiAgronom key={activeField.id + activeField.cropId} field={activeField} />}
+        {tab === 'agronom' && <Doctor key={activeField.id + activeField.cropId} field={activeField} />}
         {tab === 'impact' && <Impact field={activeField} />}
       </main>
 
