@@ -28,6 +28,19 @@ export function diagnosePhoto(cropId: string, imageBase64: string, lang: Lang): 
   return callFn('diagnose-photo', { cropId, image: imageBase64, lang });
 }
 
+/** Voice → text: sends a recorded audio clip to Whisper, returns the transcript. */
+export async function transcribe(audio: Blob, lang: Lang): Promise<string> {
+  const res = await fetch(`${base}/transcribe?lang=${lang}`, {
+    method: 'POST',
+    headers: { 'Content-Type': audio.type || 'audio/webm' },
+    body: audio,
+  });
+  if (!res.ok) throw new Error(`STT error ${res.status}`);
+  const json = await res.json();
+  if (json.error) throw new Error(json.error);
+  return (json.text as string) || '';
+}
+
 export interface ChatMsg { role: 'user' | 'assistant'; text: string; image?: string }
 
 /** Conversational agronomist: sends recent history + optional photo, gets a reply. */

@@ -8,7 +8,8 @@ export type IconName =
   | 'plus' | 'trash' | 'leaf' | 'sun' | 'help' | 'globe' | 'back'
   | 'trophy' | 'calculator' | 'tag' | 'bell' | 'chart' | 'sprout'
   | 'sandy' | 'loam' | 'clay' | 'furrow' | 'sprinkler' | 'droplet-grid'
-  | 'user' | 'chevron' | 'growth' | 'satellite' | 'pin';
+  | 'user' | 'chevron' | 'growth' | 'satellite' | 'pin'
+  | 'mic' | 'stop' | 'speaker';
 
 const P: Record<IconName, ReactNode> = {
   drop: <path d="M12 3s6.5 6.8 6.5 11.2A6.5 6.5 0 0 1 5.5 14.2C5.5 9.8 12 3 12 3Z" />,
@@ -48,6 +49,9 @@ const P: Record<IconName, ReactNode> = {
   sprinkler: <><path d="M12 4v5" /><path d="M8 9h8l-1 11H9L8 9Z" /><path d="M12 2v.01M6 5l.7.7M18 5l-.7.7" /></>,
   satellite: <><path d="M6.5 10.5 3 14l3 3 3.5-3.5" /><path d="M13.5 17.5 10 21l-3-3 3.5-3.5" /><path d="m9 12 3-3" /><path d="M10.5 7.5 16 2l6 6-5.5 5.5-6-6Z" /><path d="M16 16a4 4 0 0 0 4 4M18 21a7 7 0 0 0-7-7" /></>,
   pin: <><path d="M12 21s7-6.3 7-11a7 7 0 0 0-14 0c0 4.7 7 11 7 11Z" /><circle cx="12" cy="10" r="2.5" /></>,
+  mic: <><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M6 11a6 6 0 0 0 12 0M12 17v4M9 21h6" /></>,
+  stop: <rect x="6" y="6" width="12" height="12" rx="2" />,
+  speaker: <><path d="M4 9v6h4l5 4V5L8 9H4Z" /><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8 8 0 0 1 0 12" /></>,
 };
 
 export function Icon({

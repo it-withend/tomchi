@@ -4,6 +4,7 @@ import { t } from '../i18n';
 import { diseaseTrees, type TreeNode } from '../data/diseases';
 import { getCrop, type FieldConfig } from '../engine/irrigation';
 import { chatAsk, type ChatMsg } from '../lib/ai';
+import { useVoiceInput, speak, stopSpeak, ttsSupported } from '../lib/voice';
 import { Icon } from './Icon';
 
 const CHAT_KEY = 'tomchi.chat';
@@ -51,10 +52,18 @@ export function Doctor({ field }: { field: FieldConfig }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showTree, setShowTree] = useState(false);
+  const [speakingIdx, setSpeakingIdx] = useState<number | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
+  const voice = useVoiceInput(lang, (text) => setInput((v) => (v ? v.trim() + ' ' : '') + text));
 
   useEffect(() => { saveChat(messages); }, [messages]);
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, loading]);
+  useEffect(() => () => stopSpeak(), []); // stop any speech when leaving
+
+  const toggleSpeak = (i: number, text: string) => {
+    if (speakingIdx === i) { stopSpeak(); setSpeakingIdx(null); return; }
+    speak(text, lang); setSpeakingIdx(i);
+  };
 
   const send = async (preset?: string) => {
     const text = (preset ?? input).trim();
@@ -121,6 +130,11 @@ export function Doctor({ field }: { field: FieldConfig }) {
                 </button>
               ))}
             </div>
+            {voice.supported && (
+              <p className="mt-4 flex items-center justify-center gap-1.5 text-xs text-water-deep/70">
+                <Icon name="mic" size={14} /> {t('voiceHintEmpty', lang)}
+              </p>
+            )}
           </div>
         )}
 
@@ -132,6 +146,13 @@ export function Doctor({ field }: { field: FieldConfig }) {
               {m.role === 'assistant'
                 ? <span className="whitespace-pre-wrap">{m.text}</span>
                 : m.text}
+              {m.role === 'assistant' && m.text && ttsSupported() && (
+                <button onClick={() => toggleSpeak(i, m.text)} aria-label={t('voiceListen', lang)}
+                  className="mt-1.5 flex items-center gap-1 text-xs font-medium text-water-deep/70">
+                  <Icon name={speakingIdx === i ? 'stop' : 'speaker'} size={14} />
+                  {t('voiceListen', lang)}
+                </button>
+              )}
             </div>
           </div>
         ))}
@@ -167,11 +188,30 @@ export function Doctor({ field }: { field: FieldConfig }) {
             <button onClick={() => setPending(null)} className="ml-auto text-ink/40" aria-label={t('close', lang)}>✕</button>
           </div>
         )}
+        {/* voice status / error */}
+        {(voice.status !== 'idle' || voice.error) && (
+          <div className={`mb-2 flex items-center gap-2 rounded-full px-3 py-1.5 text-xs shadow-sm backdrop-blur ${
+            voice.error ? 'bg-clay-soft text-clay' : 'bg-card/95 text-water-deep'}`}>
+            {voice.status === 'listening' && <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-clay" />}
+            {voice.error
+              ? t(voice.error === 'denied' ? 'voiceDenied' : 'voiceError', lang)
+              : t(voice.status === 'listening' ? 'voiceListening' : 'voiceTranscribing', lang)}
+            {voice.error && <button onClick={voice.clearError} className="ml-auto text-clay/60" aria-label={t('close', lang)}>✕</button>}
+          </div>
+        )}
         <div className="flex items-end gap-2 rounded-3xl border border-line bg-card p-1.5 shadow-lg shadow-ink/5">
           <label className="grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-full text-water-deep hover:bg-wash" aria-label={t('aiPhoto', lang)}>
             <Icon name="diagnosis" size={20} />
             <input type="file" accept="image/*" capture="environment" onChange={onPhoto} className="hidden" />
           </label>
+          {voice.supported && (
+            <button onClick={voice.toggle} disabled={voice.status === 'working'}
+              aria-label={t(voice.status === 'listening' ? 'voiceStop' : 'voiceStart', lang)}
+              className={`grid h-10 w-10 shrink-0 place-items-center rounded-full disabled:opacity-50 ${
+                voice.status === 'listening' ? 'animate-pulse bg-clay text-white' : 'text-water-deep hover:bg-wash'}`}>
+              <Icon name={voice.status === 'listening' ? 'stop' : 'mic'} size={20} />
+            </button>
+          )}
           <textarea
             value={input} onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}

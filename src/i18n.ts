@@ -204,6 +204,11 @@ export const dict: Dict = {
     uz: 'Ekin haqida istalgan savolni yozing yoki kasal barg suratini yuboring — AI-agronom kasallikni aniqlab, nima qilishni oddiy tilda tushuntiradi. Suhbat saqlanadi, istagan vaqtda qaytib ko‘rasiz.',
     ru: 'Напишите любой вопрос о культуре или пришлите фото больного листа — ИИ-агроном определит болезнь и простыми словами подскажет, что делать. Переписка сохраняется, к ней можно вернуться в любой момент.',
   },
+  tutVoiceTitle: { uz: 'Ovoz bilan so‘rang', ru: 'Спросите голосом' },
+  tutVoiceBody: {
+    uz: 'Yozishga qiynalsangiz — «Agronom» sahifasida mikrofon tugmasini bosing va savolingizni ovoz bilan ayting. Ilova nutqni matnga aylantiradi va agronomdek javob beradi. Javobni ovoz bilan ham eshitishingiz mumkin.',
+    ru: 'Трудно печатать? На странице «Агроном» нажмите кнопку микрофона и просто скажите вопрос голосом — по-узбекски или по-русски. Приложение переведёт речь в текст и ответит, как агроном. Ответ можно и прослушать вслух.',
+  },
   tutSatTitle: { uz: 'Kosmosdan dala salomatligi', ru: 'Здоровье поля из космоса' },
   tutSatBody: {
     uz: '«Bugun» sahifasida dalangizni xaritada bir marta belgilang — sun’iy yo‘ldosh (Sentinel-2) o‘simliklar holatini ko‘rsatadi. Yashil — yaxshi, sariq va jigarrang — suv yoki oziq yetishmayapti. Foiz qancha baland bo‘lsa, dala shuncha sog‘lom. Har 5 kunda yangilanadi, bepul.',
@@ -251,6 +256,15 @@ export const dict: Dict = {
   chatSug1: { uz: 'Barglar sarg‘aymoqda', ru: 'Листья желтеют' },
   chatSug2: { uz: 'Qachon o‘g‘itlash kerak?', ru: 'Когда вносить подкормку?' },
   chatSug3: { uz: 'Zararkunandalarga qarshi nima sepay?', ru: 'Чем обработать от вредителей?' },
+  // Voice input / output
+  voiceStart: { uz: 'Ovozli savol', ru: 'Спросить голосом' },
+  voiceStop: { uz: 'To‘xtatish', ru: 'Остановить' },
+  voiceListening: { uz: 'Tinglayapman… gapiring', ru: 'Слушаю… говорите' },
+  voiceTranscribing: { uz: 'Nutqni o‘qiyapman…', ru: 'Распознаю речь…' },
+  voiceError: { uz: 'Eshitmadim, qayta urinib ko‘ring', ru: 'Не расслышал, попробуйте ещё раз' },
+  voiceDenied: { uz: 'Mikrofonga ruxsat bering', ru: 'Разрешите доступ к микрофону' },
+  voiceHintEmpty: { uz: 'Yozishga qiynalsangiz — mikrofon tugmasini bosib, savolingizni ayting.', ru: 'Трудно печатать? Нажмите микрофон и просто скажите вопрос голосом.' },
+  voiceListen: { uz: 'Javobni eshitish', ru: 'Прослушать ответ' },
   // Weather
   liveWeather: { uz: 'Jonli ob-havo', ru: 'Живая погода' },
   climateNormal: { uz: 'Iqlim me’yori', ru: 'Климатическая норма' },
