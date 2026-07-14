@@ -8,7 +8,9 @@ const slides: { icon: IconName; titleKey: string; bodyKey: string }[] = [
   { icon: 'drop', titleKey: 'tut2Title', bodyKey: 'tut2Body' },
   { icon: 'sprout', titleKey: 'tut3Title', bodyKey: 'tut3Body' },
   { icon: 'calendar', titleKey: 'tut4Title', bodyKey: 'tut4Body' },
-  { icon: 'diagnosis', titleKey: 'tut5Title', bodyKey: 'tut5Body' },
+  { icon: 'sparkles', titleKey: 'tut5Title', bodyKey: 'tut5Body' },
+  { icon: 'satellite', titleKey: 'tutSatTitle', bodyKey: 'tutSatBody' },
+  { icon: 'tag', titleKey: 'tutPriceTitle', bodyKey: 'tutPriceBody' },
   { icon: 'waves', titleKey: 'tut6Title', bodyKey: 'tut6Body' },
 ];
 

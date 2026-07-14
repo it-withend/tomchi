@@ -8,10 +8,10 @@ import { Icon } from './Icon';
 const FieldMap = lazy(() => import('./FieldMap'));
 
 const STATUS = {
-  healthy: { key: 'satHealthy', cls: 'text-leaf', bg: 'bg-leaf-soft' },
-  moderate: { key: 'satModerate', cls: 'text-clay', bg: 'bg-clay-soft' },
-  stressed: { key: 'satStressed', cls: 'text-clay', bg: 'bg-clay-soft' },
-  nodata: { key: 'satNoData', cls: 'text-ink/50', bg: 'bg-wash' },
+  healthy: { key: 'satHealthy', tip: 'satHealthyTip', cls: 'text-leaf', bg: 'bg-leaf-soft' },
+  moderate: { key: 'satModerate', tip: 'satModerateTip', cls: 'text-clay', bg: 'bg-clay-soft' },
+  stressed: { key: 'satStressed', tip: 'satStressedTip', cls: 'text-clay', bg: 'bg-clay-soft' },
+  nodata: { key: 'satNoData', tip: 'satNoDataTip', cls: 'text-ink/50', bg: 'bg-wash' },
 } as const;
 
 export function FieldNdvi({ field }: { field: FieldConfig }) {
@@ -113,19 +113,21 @@ export function FieldNdvi({ field }: { field: FieldConfig }) {
                 <p className="font-display text-3xl font-bold text-water-deep">
                   {formatNum(data.health ?? 0, lang)}<span className="text-lg">%</span>
                 </p>
-                <p className={`flex-1 text-sm font-medium ${STATUS[data.status].cls}`}>
+                <p className={`rounded-full px-3 py-1 text-sm font-semibold ${STATUS[data.status].bg} ${STATUS[data.status].cls}`}>
                   {t(STATUS[data.status].key, lang)}
                 </p>
               </div>
               <div className="mt-2 h-2 overflow-hidden rounded-full bg-line">
                 <div className="h-full rounded-full bg-leaf transition-all" style={{ width: `${data.health ?? 0}%` }} />
               </div>
+              {/* plain-language "what to do" */}
+              <p className="mt-2.5 text-sm leading-snug text-ink/70">{t(STATUS[data.status].tip, lang)}</p>
             </div>
           ) : (
             !loading && (
-              <div className={`mt-4 rounded-xl px-4 py-3 text-center text-sm ${STATUS.nodata.bg} ${STATUS.nodata.cls}`}>
-                {failed ? t('satError', lang) : t('satNoData', lang)}
-                <button onClick={load} className="ml-2 font-medium text-water-deep underline">{t('satRefresh', lang)}</button>
+              <div className={`mt-4 rounded-xl px-4 py-3 text-center text-sm leading-snug ${STATUS.nodata.bg} ${STATUS.nodata.cls}`}>
+                {failed ? t('satError', lang) : t('satNoDataTip', lang)}
+                <button onClick={load} className="ml-1 font-medium text-water-deep underline">{t('satRefresh', lang)}</button>
               </div>
             )
           )}
