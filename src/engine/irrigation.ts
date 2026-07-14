@@ -19,6 +19,8 @@ export interface FieldConfig {
   areaHa: number;
   method: Method;
   soil: Soil;
+  lat?: number; // field centre, for satellite (NDVI) health
+  lng?: number;
   lastWatered?: string; // legacy single date (migrated into log)
   log?: WateringEvent[];
 }

@@ -10,6 +10,7 @@ import { openReport } from '../engine/report';
 import { DropGauge } from './DropGauge';
 import { Icon } from './Icon';
 import { CropPrices } from './CropPrices';
+import { FieldNdvi } from './FieldNdvi';
 
 export function Dashboard({ field }: { field: FieldConfig }) {
   const { lang, fields, setActiveFieldId, setAdding, logWatering, removeField, syncEnabled } = useApp();
@@ -186,6 +187,9 @@ export function Dashboard({ field }: { field: FieldConfig }) {
           )}
         </>
       )}
+
+      {/* satellite field health */}
+      <FieldNdvi field={field} />
 
       {/* watering history */}
       <section className="mt-5 rounded-2xl border border-line bg-card p-4">

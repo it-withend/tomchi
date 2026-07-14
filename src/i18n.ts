@@ -292,6 +292,36 @@ export const dict: Dict = {
     uz: 'Hisob-kitoblar FAO-56 (Penman-Monteith) metodikasi va O‘zGidromet iqlim me’yorlariga asoslangan.',
     ru: 'Расчёты основаны на методике FAO-56 (Пенман-Монтейт) и климатических нормах Узгидромета.',
   },
+  // Satellite field health (NDVI)
+  satTitle: { uz: 'Kosmosdan dala salomatligi', ru: 'Здоровье поля из космоса' },
+  satSub: { uz: 'Sentinel-2 sun’iy yo‘ldoshi · NDVI', ru: 'Спутник Sentinel-2 · NDVI' },
+  satSetLocation: { uz: 'Dalani xaritada belgilang', ru: 'Отметьте поле на карте' },
+  satSetHint: {
+    uz: 'Dalangiz joylashuvini ko‘rsating — sun’iy yo‘ldosh o‘simliklar holatini ko‘rsatadi.',
+    ru: 'Укажите расположение поля — спутник покажет состояние растений.',
+  },
+  satMark: { uz: 'Dalani belgilash', ru: 'Отметить поле' },
+  satHealth: { uz: 'O‘simlik holati', ru: 'Состояние растений' },
+  satHealthy: { uz: 'Sog‘lom, gullab-yashnayapti', ru: 'Здоровое, развитое' },
+  satModerate: { uz: 'O‘rtacha — kuzatib boring', ru: 'Умеренное — следите' },
+  satStressed: { uz: 'Stress — suv yetishmasligi mumkin', ru: 'Стресс — возможна нехватка воды' },
+  satNoData: { uz: 'Ochiq snapshot topilmadi (bulutlar)', ru: 'Нет ясного снимка (облачность)' },
+  satScene: { uz: 'Snapshot sanasi', ru: 'Дата снимка' },
+  satLegendLow: { uz: 'Bo‘sh / stress', ru: 'Голая / стресс' },
+  satLegendHigh: { uz: 'Zich o‘simlik', ru: 'Густая зелень' },
+  satLoading: { uz: 'Sun’iy yo‘ldosh ma’lumoti yuklanmoqda…', ru: 'Загружаем данные спутника…' },
+  satError: { uz: 'Hozircha ma’lumot yo‘q. Keyinroq urinib ko‘ring.', ru: 'Данные пока недоступны. Попробуйте позже.' },
+  satRefresh: { uz: 'Yangilash', ru: 'Обновить' },
+  // Map picker
+  pickTitle: { uz: 'Dalangizni toping', ru: 'Найдите ваше поле' },
+  pickHint: {
+    uz: 'Xaritani suring va dala markaziga bosing. Sun’iy yo‘ldosh ko‘rinishida dalangizni taning.',
+    ru: 'Двигайте карту и нажмите на центр поля. На спутниковом снимке найдите свой участок.',
+  },
+  pickGps: { uz: 'Mening joylashuvim', ru: 'Моё местоположение' },
+  pickSave: { uz: 'Saqlash', ru: 'Сохранить' },
+  pickCancel: { uz: 'Bekor qilish', ru: 'Отмена' },
+  pickGpsFail: { uz: 'Joylashuvni aniqlab bo‘lmadi', ru: 'Не удалось определить местоположение' },
 };
 
 export function t(key: string, lang: Lang): string {

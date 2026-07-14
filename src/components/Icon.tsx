@@ -8,7 +8,7 @@ export type IconName =
   | 'plus' | 'trash' | 'leaf' | 'sun' | 'help' | 'globe' | 'back'
   | 'trophy' | 'calculator' | 'tag' | 'bell' | 'chart' | 'sprout'
   | 'sandy' | 'loam' | 'clay' | 'furrow' | 'sprinkler' | 'droplet-grid'
-  | 'user' | 'chevron' | 'growth';
+  | 'user' | 'chevron' | 'growth' | 'satellite' | 'pin';
 
 const P: Record<IconName, ReactNode> = {
   drop: <path d="M12 3s6.5 6.8 6.5 11.2A6.5 6.5 0 0 1 5.5 14.2C5.5 9.8 12 3 12 3Z" />,
@@ -46,6 +46,8 @@ const P: Record<IconName, ReactNode> = {
   clay: <><rect x="3" y="5" width="18" height="14" rx="1.5" /><path d="M3 12h18M12 5v7M8 12v7M16 12v7" /></>,
   furrow: <path d="M4 8c2 1.5 14 1.5 16 0M4 13c2 1.5 14 1.5 16 0M4 18c2 1.5 14 1.5 16 0" />,
   sprinkler: <><path d="M12 4v5" /><path d="M8 9h8l-1 11H9L8 9Z" /><path d="M12 2v.01M6 5l.7.7M18 5l-.7.7" /></>,
+  satellite: <><path d="M6.5 10.5 3 14l3 3 3.5-3.5" /><path d="M13.5 17.5 10 21l-3-3 3.5-3.5" /><path d="m9 12 3-3" /><path d="M10.5 7.5 16 2l6 6-5.5 5.5-6-6Z" /><path d="M16 16a4 4 0 0 0 4 4M18 21a7 7 0 0 0-7-7" /></>,
+  pin: <><path d="M12 21s7-6.3 7-11a7 7 0 0 0-14 0c0 4.7 7 11 7 11Z" /><circle cx="12" cy="10" r="2.5" /></>,
 };
 
 export function Icon({
