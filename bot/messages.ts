@@ -37,8 +37,8 @@ export const M: M = {
     ru: 'У вас пока нет поля. Создайте поле в приложении или подключите через /link код.',
   },
   menu: {
-    uz: '📋 Buyruqlar:\n/today — bugungi suv me’yori\n/calendar — mavsumiy taqvim\n/savings — suv va pul tejamkorligi\n/history — sug‘orish tarixi\n/stop — eslatmalarni o‘chirish',
-    ru: '📋 Команды:\n/today — норма воды на сегодня\n/calendar — сезонный календарь\n/savings — экономия воды и денег\n/history — история поливов\n/stop — выключить напоминания',
+    uz: '📋 Buyruqlar:\n/fields — dalalaringiz\n/today — bugungi suv me’yori\n/calendar — mavsumiy taqvim\n/savings — suv va pul tejamkorligi\n/history — sug‘orish tarixi\n/stop — eslatmalarni o‘chirish',
+    ru: '📋 Команды:\n/fields — ваши поля\n/today — норма воды на сегодня\n/calendar — сезонный календарь\n/savings — экономия воды и денег\n/history — история поливов\n/stop — выключить напоминания',
   },
   calendarHeader: { uz: '📅 <b>Mavsumiy sug‘orish taqvimi</b>', ru: '📅 <b>Сезонный календарь полива</b>' },
   calendarTotal: { uz: 'Mavsum jami: <b>{v} m³</b>', ru: 'Итого за сезон: <b>{v} m³</b>' },
@@ -50,6 +50,15 @@ export const M: M = {
   historyEmpty: { uz: 'Hali sug‘orish qaydlari yo‘q. Ilovada suv quyganingizni belgilang.', ru: 'Пока нет записей о поливе. Отмечайте полив в приложении.' },
   historyWatered: { uz: '💧 {date} — sug‘orildi', ru: '💧 {date} — полив' },
   historyRain: { uz: '🌧️ {date} — yomg‘ir', ru: '🌧️ {date} — дождь' },
+  // Fields picker + site link + smart alerts
+  siteLine: { uz: '\n\n🌐 Ilova: {url}', ru: '\n\n🌐 Приложение: {url}' },
+  openApp: { uz: '🌐 Ilovani ochish', ru: '🌐 Открыть приложение' },
+  myFields: { uz: '🌾 Mening dalalarim', ru: '🌾 Мои поля' },
+  fieldsHeader: { uz: '🌾 <b>Sizning dalalaringiz</b> ({n} ta)\nKo‘rish uchun dalani tanlang:', ru: '🌾 <b>Ваши поля</b> ({n})\nВыберите поле для просмотра:' },
+  linkOkFields: { uz: '✅ Ilova ulandi! Barcha dalalaringiz shu yerda.', ru: '✅ Приложение подключено! Все ваши поля здесь.' },
+  backFields: { uz: '◀ Dalalarga', ru: '◀ К полям' },
+  stageChanged: { uz: '📢 <b>{crop}</b>: yangi bosqich — {stage}', ru: '📢 <b>{crop}</b>: новая фаза — {stage}' },
+  fertilizerNow: { uz: '🌿 Oziqlantirish: {text}', ru: '🌿 Подкормка: {text}' },
 };
 
 export const monthShort: Record<string, string[]> = {

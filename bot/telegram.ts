@@ -7,7 +7,7 @@ function api(): string {
   return `https://api.telegram.org/bot${token}`;
 }
 
-export interface InlineButton { text: string; callback_data: string }
+export interface InlineButton { text: string; callback_data?: string; url?: string }
 
 async function call(method: string, body: Record<string, unknown>) {
   const res = await fetch(`${api()}/${method}`, {

@@ -6,10 +6,37 @@ import { getSub, upsertSub, allSubscribed, type Subscriber, type Lang, type Meth
 import { m, stageName, methodName, soilName, monthShort } from './messages';
 import { regions } from '../src/data/regions';
 import { crops, type Crop } from '../src/data/crops';
-import { dayStatus, getCrop, getRegion, seasonCalendar, seasonTotals, SOM_PER_M3, type FieldConfig } from '../src/engine/irrigation';
+import { dayStatus, getCrop, getRegion, seasonCalendar, seasonTotals, stageAt, daysIntoSeason, SOM_PER_M3, type FieldConfig } from '../src/engine/irrigation';
 import { supaEnabled, linkChat, isLinked, linkedLang, fieldsForChat, subscribedChats, setSubscribed, eventsForChat } from './supa';
 
+const WEBSITE = process.env.TOMCHI_SITE_URL || 'https://tomchiai.netlify.app';
+
 // ---- helpers ----------------------------------------------------------------
+
+/** If a field entered a new growth stage today, an alert with that stage's
+ *  fertilisation tip; otherwise null. Stateless — fires on the transition day. */
+function stageAlert(field: FieldConfig, lang: Lang): string | null {
+  const crop = getCrop(field.cropId);
+  const today = new Date();
+  const dIn = daysIntoSeason(crop, today);
+  if (dIn < 0) return null;
+  const yst = new Date(today);
+  yst.setDate(today.getDate() - 1);
+  const dPrev = daysIntoSeason(crop, yst);
+  const stageToday = stageAt(crop, dIn).key;
+  const stagePrev = dPrev >= 0 ? stageAt(crop, dPrev).key : null;
+  if (stageToday === stagePrev) return null; // no change today
+  const parts = [m('stageChanged', lang, { crop: crop.name[lang], stage: stageName[stageToday]?.[lang] ?? stageToday })];
+  const fert = crop.fertilizer.find((f) => f.stage === stageToday);
+  if (fert) parts.push(m('fertilizerNow', lang, { text: fert.text[lang] }));
+  return parts.join('\n');
+}
+
+function fieldLabel(f: FieldConfig, lang: Lang): string {
+  const crop = getCrop(f.cropId);
+  const region = getRegion(f.regionId);
+  return `${crop.emoji} ${crop.name[lang]} · ${f.areaHa} ${lang === 'uz' ? 'ga' : 'га'} (${region.name[lang]})`;
+}
 
 function grid(buttons: InlineButton[], cols = 2): InlineButton[][] {
   const rows: InlineButton[][] = [];
@@ -66,8 +93,21 @@ function fieldBlock(field: FieldConfig, lang: Lang, withHeader: boolean): string
 
 function dailyMessage(fields: FieldConfig[], lang: Lang, rain: boolean): string | null {
   if (!fields.length) return null;
+  const alerts = fields.map((f) => stageAlert(f, lang)).filter(Boolean) as string[];
   const blocks = fields.map((f) => fieldBlock(f, lang, fields.length > 1)).filter(Boolean) as string[];
-  const out = [m('dailyHeader', lang), '', blocks.join('\n\n')];
+  const out: string[] = [];
+  if (alerts.length) out.push(alerts.join('\n\n'), '');
+  out.push(m('dailyHeader', lang), '', blocks.join('\n\n'));
+  if (rain) out.push('\n' + m('rainSkip', lang));
+  return out.join('\n');
+}
+
+/** One field's block with its header (for the per-field detail view). */
+function singleFieldMessage(f: FieldConfig, lang: Lang, rain: boolean): string {
+  const alert = stageAlert(f, lang);
+  const out: string[] = [];
+  if (alert) out.push(alert, '');
+  out.push(fieldBlock(f, lang, true) ?? '');
   if (rain) out.push('\n' + m('rainSkip', lang));
   return out.join('\n');
 }
@@ -154,6 +194,7 @@ function menuKb(lang: Lang): InlineButton[][] {
       { text: lang === 'uz' ? '🌊 Tejamkorlik' : '🌊 Экономия', callback_data: 'cmd:savings' },
       { text: lang === 'uz' ? '📖 Tarix' : '📖 История', callback_data: 'cmd:history' },
     ],
+    [{ text: m('myFields', lang), callback_data: 'cmd:fields' }],
   ];
 }
 
@@ -183,6 +224,39 @@ async function replyHistory(chatId: number, lang: Lang) {
   await sendMessage(chatId, text, menuKb(lang));
 }
 
+/** List the chat's fields as buttons so the farmer can pick one to view. */
+async function replyFields(chatId: number, lang: Lang, sub?: Subscriber) {
+  const fields = await resolveFields(chatId, sub);
+  if (!fields.length) { await sendMessage(chatId, m('noFields', lang)); return; }
+  if (fields.length === 1) { await replyFieldDetail(chatId, lang, fields[0].id, sub); return; }
+  const kb = fields.map((f) => [{ text: fieldLabel(f, lang), callback_data: `fld:${f.id}` }]);
+  await sendMessage(chatId, m('fieldsHeader', lang, { n: fields.length }), kb);
+}
+
+/** One field: today + a per-field menu (calendar / savings) and a back button. */
+async function replyFieldDetail(chatId: number, lang: Lang, fieldId: string, sub?: Subscriber) {
+  const fields = await resolveFields(chatId, sub);
+  const f = fields.find((x) => x.id === fieldId) ?? fields[0];
+  if (!f) { await sendMessage(chatId, m('noFields', lang)); return; }
+  const rain = await rainSoon(f.regionId);
+  const kb: InlineButton[][] = [
+    [
+      { text: lang === 'uz' ? '📅 Taqvim' : '📅 Календарь', callback_data: `fc:${f.id}` },
+      { text: lang === 'uz' ? '🌊 Tejamkorlik' : '🌊 Экономия', callback_data: `fs:${f.id}` },
+    ],
+    ...(fields.length > 1 ? [[{ text: m('backFields', lang), callback_data: 'cmd:fields' }]] : []),
+  ];
+  await sendMessage(chatId, singleFieldMessage(f, lang, rain), kb);
+}
+
+async function replyFieldView(chatId: number, lang: Lang, fieldId: string, view: 'cal' | 'sav', sub?: Subscriber) {
+  const fields = await resolveFields(chatId, sub);
+  const f = fields.find((x) => x.id === fieldId);
+  if (!f) { await sendMessage(chatId, m('noFields', lang)); return; }
+  const back: InlineButton[][] = [[{ text: m('backFields', lang), callback_data: `fld:${f.id}` }]];
+  await sendMessage(chatId, view === 'cal' ? calendarText([f], lang) : savingsText([f], lang), back);
+}
+
 // ---- update handling --------------------------------------------------------
 
 async function onMessage(msg: any) {
@@ -192,8 +266,17 @@ async function onMessage(msg: any) {
   const lang: Lang = await resolveLang(chatId, sub);
 
   if (text.startsWith('/start')) {
-    await upsertSub(chatId, { step: 'lang' });
-    await sendMessage(chatId, m('welcome', lang) + (supaEnabled ? m('linkHint', lang) : ''), langKb);
+    const linked = (await isLinked(chatId)) || sub?.step === 'done';
+    const openBtn: InlineButton[] = [{ text: m('openApp', lang), url: WEBSITE }];
+    if (linked) {
+      await sendMessage(chatId, m('welcome', lang) + m('siteLine', lang, { url: WEBSITE }),
+        [openBtn, [{ text: m('myFields', lang), callback_data: 'cmd:fields' }]]);
+      await replyFields(chatId, lang, sub);
+    } else {
+      await upsertSub(chatId, { step: 'lang' });
+      await sendMessage(chatId, m('welcome', lang) + m('siteLine', lang, { url: WEBSITE }) + (supaEnabled ? m('linkHint', lang) : ''),
+        [openBtn, ...langKb]);
+    }
     return;
   }
   if (text.startsWith('/help')) { await sendMessage(chatId, m('help', lang)); return; }
@@ -201,10 +284,11 @@ async function onMessage(msg: any) {
     const code = text.split(/\s+/)[1]?.trim();
     if (!code || !/^\d{6}$/.test(code)) { await sendMessage(chatId, m('linkUsage', lang)); return; }
     const ok = await linkChat(code, chatId, lang);
-    if (ok) { await sendMessage(chatId, m('linkOk', lang)); await replyToday(chatId, lang, sub); }
+    if (ok) { await sendMessage(chatId, m('linkOkFields', lang)); await replyFields(chatId, lang, sub); }
     else await sendMessage(chatId, m('linkFail', lang));
     return;
   }
+  if (text.startsWith('/fields') || text.startsWith('/dalalar')) { await replyFields(chatId, lang, sub); return; }
   if (text.startsWith('/stop')) {
     await upsertSub(chatId, { subscribed: false });
     await setSubscribed(chatId, false);
@@ -260,8 +344,12 @@ async function onCallback(cb: any) {
       else if (value === 'calendar') await replyCalendar(chatId, lang, sub);
       else if (value === 'savings') await replySavings(chatId, lang, sub);
       else if (value === 'history') await replyHistory(chatId, lang);
+      else if (value === 'fields') await replyFields(chatId, lang, sub);
       break;
     }
+    case 'fld': await replyFieldDetail(chatId, lang, value, sub); break;
+    case 'fc': await replyFieldView(chatId, lang, value, 'cal', sub); break;
+    case 'fs': await replyFieldView(chatId, lang, value, 'sav', sub); break;
   }
 }
 
