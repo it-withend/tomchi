@@ -201,7 +201,7 @@ export function Doctor({ field }: { field: FieldConfig }) {
         )}
         <div className="flex items-end gap-2 rounded-3xl border border-line bg-card p-1.5 shadow-lg shadow-ink/5">
           <label className="grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-full text-water-deep hover:bg-wash" aria-label={t('aiPhoto', lang)}>
-            <Icon name="diagnosis" size={20} />
+            <Icon name="camera" size={20} />
             <input type="file" accept="image/*" capture="environment" onChange={onPhoto} className="hidden" />
           </label>
           {voice.supported && (

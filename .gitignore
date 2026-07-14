@@ -8,3 +8,5 @@ dist/
 **/.env
 bot/node_modules/
 bot/data/
+Tomchi_PTA.pptx
+tsconfig.tsbuildinfo

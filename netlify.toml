@@ -14,6 +14,17 @@
 [functions]
   node_bundler = "esbuild"
 
+# Security headers (baseline web standards; CSP kept permissive enough for
+# data:-URL NDVI images, Esri map tiles and inline Vite styles).
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(self), microphone=(self), geolocation=(self)"
+    Content-Security-Policy = "default-src 'self'; img-src 'self' data: blob: https://server.arcgisonline.com; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' https://*.supabase.co https://api.open-meteo.com; font-src 'self' data:; frame-ancestors 'none'"
+
 # SPA fallback (safe even though the app is single-page)
 [[redirects]]
   from = "/*"

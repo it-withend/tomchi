@@ -9,7 +9,7 @@ export type IconName =
   | 'trophy' | 'calculator' | 'tag' | 'bell' | 'chart' | 'sprout'
   | 'sandy' | 'loam' | 'clay' | 'furrow' | 'sprinkler' | 'droplet-grid'
   | 'user' | 'chevron' | 'growth' | 'satellite' | 'pin'
-  | 'mic' | 'stop' | 'speaker';
+  | 'mic' | 'stop' | 'speaker' | 'camera';
 
 const P: Record<IconName, ReactNode> = {
   drop: <path d="M12 3s6.5 6.8 6.5 11.2A6.5 6.5 0 0 1 5.5 14.2C5.5 9.8 12 3 12 3Z" />,
@@ -52,6 +52,7 @@ const P: Record<IconName, ReactNode> = {
   mic: <><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M6 11a6 6 0 0 0 12 0M12 17v4M9 21h6" /></>,
   stop: <rect x="6" y="6" width="12" height="12" rx="2" />,
   speaker: <><path d="M4 9v6h4l5 4V5L8 9H4Z" /><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8 8 0 0 1 0 12" /></>,
+  camera: <><path d="M3 8a2 2 0 0 1 2-2h2l1.2-1.8A2 2 0 0 1 9.9 3h4.2a2 2 0 0 1 1.7 1.2L17 6h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8Z" /><circle cx="12" cy="13" r="3.5" /></>,
 };
 
 export function Icon({

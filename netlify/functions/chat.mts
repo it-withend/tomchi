@@ -16,6 +16,10 @@ export default async (req) => {
       return new Response(JSON.stringify({ error: 'empty message' }), { status: 400, headers: cors });
     }
 
+    if (typeof image === 'string' && image.length > 4_000_000) {
+      return new Response(JSON.stringify({ error: 'image too large' }), { status: 413, headers: cors });
+    }
+
     let model = TEXT_MODEL;
     if (image && typeof image === 'string') {
       model = VISION_MODEL;

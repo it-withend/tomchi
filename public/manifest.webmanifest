@@ -7,6 +7,18 @@
   "background_color": "#eef6f7",
   "theme_color": "#0a5570",
   "icons": [
-    { "src": "/tomchi.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
-  ]
+    {
+      "src": "/tomchi.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/tomchi.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "lang": "uz"
 }
