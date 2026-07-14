@@ -9,7 +9,6 @@ import { dayFrom, nextRainDay, RAIN_SKIP_MM } from '../engine/weather';
 import { openReport } from '../engine/report';
 import { DropGauge } from './DropGauge';
 import { Icon } from './Icon';
-import { CropPrices } from './CropPrices';
 import { FieldNdvi } from './FieldNdvi';
 
 export function Dashboard({ field }: { field: FieldConfig }) {
@@ -229,8 +228,6 @@ export function Dashboard({ field }: { field: FieldConfig }) {
           <Icon name="chevron" size={18} className="text-water-deep" />
         </button>
       )}
-
-      <CropPrices field={field} />
 
       <p className="mt-8 text-center text-xs leading-relaxed text-ink/40">{t('methodology', lang)}</p>
 

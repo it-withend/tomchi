@@ -146,15 +146,6 @@ export const dict: Dict = {
   agronomQ1: { uz: 'Barglar sarg‘aymoqda, nima qilay?', ru: 'Листья желтеют, что делать?' },
   agronomQ2: { uz: 'Hozir qanday o‘g‘it kerak?', ru: 'Какое удобрение нужно сейчас?' },
   agronomQ3: { uz: 'Hosilni qanday saqlayman?', ru: 'Как хранить урожай?' },
-  // Crop market prices
-  pricesTitle: { uz: 'Bozor narxlari', ru: 'Рыночные цены' },
-  pricesSub: { uz: 'Hosilingiz uchun taxminiy narx', ru: 'Ориентировочная цена вашего урожая' },
-  pricePerKg: { uz: 'so‘m/kg', ru: 'сум/кг' },
-  sellAdvice: { uz: 'Qachon sotish yaxshi', ru: 'Когда выгоднее продавать' },
-  priceIndicative: { uz: 'Taxminiy narxlar (%s). Aniq narx bozorga bog‘liq.', ru: 'Ориентировочные цены (%s). Точная зависит от рынка.' },
-  trendUp: { uz: 'ko‘tarilmoqda', ru: 'растёт' },
-  trendDown: { uz: 'tushmoqda', ru: 'падает' },
-  trendFlat: { uz: 'barqaror', ru: 'стабильна' },
   // Soil
   stepSoil: { uz: 'Tuproq turi', ru: 'Тип почвы' },
   soil_sandy: { uz: 'Qumloq', ru: 'Песчаная' },
@@ -218,15 +209,10 @@ export const dict: Dict = {
     uz: '«Bugun» sahifasida dalangizni xaritada bir marta belgilang — sun’iy yo‘ldosh (Sentinel-2) o‘simliklar holatini ko‘rsatadi. Yashil — yaxshi, sariq va jigarrang — suv yoki oziq yetishmayapti. Foiz qancha baland bo‘lsa, dala shuncha sog‘lom. Har 5 kunda yangilanadi, bepul.',
     ru: 'На странице «Сегодня» отметьте поле на карте один раз — спутник (Sentinel-2) покажет состояние ваших растений. Зелёный — хорошо, жёлтый и коричневый — не хватает воды или питания. Чем выше процент, тем здоровее поле. Обновляется каждые 5 дней, бесплатно.',
   },
-  tutPriceTitle: { uz: 'Bozor narxi va foyda', ru: 'Цены рынка и выгода' },
-  tutPriceBody: {
-    uz: '«Bugun» sahifasida hosilingizning taxminiy bozor narxini va qachon sotish foydali ekanini ko‘rasiz. «Tejamkorlik» sahifasidagi hisoblagich esa tomchilatib sug‘orishga o‘tsangiz, xarajat qancha vaqtda qoplanishini ko‘rsatadi.',
-    ru: 'На странице «Сегодня» — ориентировочная рыночная цена вашего урожая и совет, когда выгоднее продавать. А калькулятор на странице «Экономия» покажет, за сколько окупится переход на капельный полив.',
-  },
   tut6Title: { uz: '«Tejamkorlik» — sizning foydangiz', ru: '«Экономия» — ваша выгода' },
   tut6Body: {
-    uz: 'Ilova bo‘yicha sug‘orsangiz, mavsumda qancha suv va pul tejashingizni ko‘rasiz. Suvni tejash — Orol uchun ham, cho‘ntagingiz uchun ham foyda. Savollar bo‘lsa — yuqoridagi «?» tugmasini bosing, bu qo‘llanma qayta ochiladi.',
-    ru: 'Поливая по приложению, вы видите, сколько воды и денег сэкономите за сезон. Экономия воды — польза и для Арала, и для вашего кармана. Появятся вопросы — нажмите «?» сверху, эта инструкция откроется снова.',
+    uz: 'Ilova bo‘yicha sug‘orsangiz, mavsumda qancha suv va pul tejashingizni ko‘rasiz, hisoblagich esa tomchilatib sug‘orish qancha vaqtda o‘zini oqlashini ko‘rsatadi. Suvni tejash — Orol uchun ham, cho‘ntagingiz uchun ham foyda. Savollar bo‘lsa — yuqoridagi «?» tugmasini bosing, bu qo‘llanma qayta ochiladi.',
+    ru: 'Поливая по приложению, вы видите, сколько воды и денег сэкономите за сезон, а калькулятор покажет, за сколько окупится капельный полив. Экономия воды — польза и для Арала, и для вашего кармана. Появятся вопросы — нажмите «?» сверху, эта инструкция откроется снова.',
   },
   help: { uz: 'Yordam', ru: 'Помощь' },
   // Telegram pairing

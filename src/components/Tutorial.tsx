@@ -10,7 +10,6 @@ const slides: { icon: IconName; titleKey: string; bodyKey: string }[] = [
   { icon: 'calendar', titleKey: 'tut4Title', bodyKey: 'tut4Body' },
   { icon: 'sparkles', titleKey: 'tut5Title', bodyKey: 'tut5Body' },
   { icon: 'satellite', titleKey: 'tutSatTitle', bodyKey: 'tutSatBody' },
-  { icon: 'tag', titleKey: 'tutPriceTitle', bodyKey: 'tutPriceBody' },
   { icon: 'waves', titleKey: 'tut6Title', bodyKey: 'tut6Body' },
 ];
 
