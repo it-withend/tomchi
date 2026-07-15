@@ -70,6 +70,23 @@ export const dict: Dict = {
   stage_mid: { uz: 'Gullash / hosil', ru: 'Цветение / плодоношение' },
   stage_late: { uz: 'Pishish', ru: 'Созревание' },
   stage_off: { uz: 'Mavsumdan tashqari', ru: 'Вне сезона' },
+  stageLegendTitle: { uz: 'Bosqichlar nimani anglatadi', ru: 'Что означают фазы' },
+  stageDesc_initial: {
+    uz: 'Urug‘ unib, nihollar chiqadi. Suv oz, lekin tuproq nam bo‘lishi kerak.',
+    ru: 'Семена прорастают, появляются всходы. Воды нужно мало, но почва должна быть влажной.',
+  },
+  stageDesc_development: {
+    uz: 'O‘simlik tez o‘sadi va barg yozadi. Suvga ehtiyoj ortib boradi.',
+    ru: 'Растение быстро растёт и набирает листву. Потребность в воде растёт.',
+  },
+  stageDesc_mid: {
+    uz: 'Gullash va hosil tugish davri — eng ko‘p suv talab qilinadi.',
+    ru: 'Цветение и завязь плодов — самый большой расход воды.',
+  },
+  stageDesc_late: {
+    uz: 'Hosil pishadi. Suv asta-sekin kamaytiriladi.',
+    ru: 'Урожай созревает. Полив постепенно сокращают.',
+  },
   // Doctor
   doctorTitle: { uz: 'O‘simlik shifokori', ru: 'Доктор растений' },
   doctorIntro: {

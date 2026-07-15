@@ -51,8 +51,6 @@ export function openReport(field: FieldConfig, lang: Lang) {
   .grid div { display: flex; justify-content: space-between; border-bottom: 1px dashed #d5e5e9; padding: 5px 0; }
   .big { font-size: 20px; font-weight: 700; color: #0a5570; }
   .foot { margin-top: 28px; font-size: 11px; color: #6b8b93; }
-  button { margin: 16px 0; padding: 10px 18px; background: #0f7ba0; color: #fff; border: 0; border-radius: 8px; font-size: 14px; cursor: pointer; }
-  @media print { button { display: none; } }
 </style></head><body>
   <div class="head">
     <img src="/tomchi.png" alt="">
@@ -61,7 +59,6 @@ export function openReport(field: FieldConfig, lang: Lang) {
       <div class="sub">Tomchi — ${t('tagline', lang)}</div>
     </div>
   </div>
-  <button onclick="window.print()">${t('reportPrint', lang)}</button>
   <h2>${t('reportField', lang)}</h2>
   <div class="grid">
     <div><span>${crop.emoji} ${t('stepCrop', lang)}</span><b>${crop.name[lang]}</b></div>
@@ -93,9 +90,38 @@ export function openReport(field: FieldConfig, lang: Lang) {
   <p class="foot">${t('methodology', lang)}<br>${t('reportGenerated', lang)}: ${formatDate(new Date(), lang)} · awards.gov.uz/pta</p>
 </body></html>`;
 
-  const w = window.open('', '_blank');
-  if (w) {
-    w.document.write(html);
-    w.document.close();
-  }
+  // Print via a hidden same-origin iframe. A popup (window.open) gets silently
+  // blocked by browsers, and an inline onclick="print()" is blocked by our CSP
+  // (script-src 'self'), so neither reliably fired — hence "nothing happens".
+  const frame = document.createElement('iframe');
+  frame.setAttribute('aria-hidden', 'true');
+  frame.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
+  frame.srcdoc = html;
+
+  let done = false;
+  const cleanup = () => {
+    if (done) return;
+    done = true;
+    // Remove after the print dialog has had a chance to open.
+    setTimeout(() => frame.remove(), 1000);
+  };
+
+  frame.onload = () => {
+    const win = frame.contentWindow;
+    if (!win) { frame.remove(); return; }
+    win.addEventListener('afterprint', cleanup);
+    // Give the browser a tick to lay out the image/fonts before printing.
+    setTimeout(() => {
+      try {
+        win.focus();
+        win.print();
+      } catch {
+        frame.remove();
+      }
+      // Fallback cleanup if afterprint never fires (some browsers/PDF flows).
+      setTimeout(cleanup, 60_000);
+    }, 250);
+  };
+
+  document.body.appendChild(frame);
 }

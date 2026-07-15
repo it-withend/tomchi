@@ -1,6 +1,7 @@
 import { useApp } from '../state';
 import { t, formatNum } from '../i18n';
 import { seasonCalendar, getCrop, upcomingWaterings, dayStatus, type FieldConfig } from '../engine/irrigation';
+import type { Crop, StageKey } from '../data/crops';
 import { Icon } from './Icon';
 
 const monthNames = {
@@ -13,12 +14,26 @@ const weekdayNames = {
   ru: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
 };
 
-const stageColor: Record<string, string> = {
-  initial: 'bg-leaf-soft text-leaf',
-  development: 'bg-water/10 text-water-deep',
-  mid: 'bg-clay-soft text-clay',
-  late: 'bg-line text-ink/60',
+// Solid dot colour per stage — reused on each month row and in the legend so a
+// farmer can match "which colour is which phase" at a glance.
+const stageDot: Record<StageKey, string> = {
+  initial: 'bg-leaf',
+  development: 'bg-water',
+  mid: 'bg-clay',
+  late: 'bg-ink/40',
 };
+
+/** Calendar date span of each growth stage, from planting + FAO-56 stage lengths. */
+function stageRanges(crop: Crop, year: number): { key: StageKey; start: Date; end: Date }[] {
+  const start = new Date(year, crop.plantMonth, 1);
+  let offset = 0;
+  return crop.stages.map((st) => {
+    const s = new Date(start); s.setDate(s.getDate() + offset);
+    const e = new Date(start); e.setDate(e.getDate() + offset + st.days - 1);
+    offset += st.days;
+    return { key: st.key, start: s, end: e };
+  });
+}
 
 function dateLabel(d: Date, lang: 'uz' | 'ru'): string {
   const today = new Date();
@@ -30,6 +45,10 @@ function dateLabel(d: Date, lang: 'uz' | 'ru'): string {
   return `${d.getDate()} ${monthNames[lang][d.getMonth()].toLowerCase()}, ${weekdayNames[lang][d.getDay()]}`;
 }
 
+function dayMonth(d: Date, lang: 'uz' | 'ru'): string {
+  return `${d.getDate()} ${monthNames[lang][d.getMonth()].toLowerCase()}`;
+}
+
 export function CalendarView({ field }: { field: FieldConfig }) {
   const { lang } = useApp();
   const rows = seasonCalendar(field);
@@ -39,6 +58,7 @@ export function CalendarView({ field }: { field: FieldConfig }) {
   const nowMonth = new Date().getMonth();
   const upcoming = upcomingWaterings(field, 5);
   const s = dayStatus(field);
+  const ranges = stageRanges(crop, new Date().getFullYear());
 
   return (
     <div className="px-5 pb-28 pt-6">
@@ -76,8 +96,10 @@ export function CalendarView({ field }: { field: FieldConfig }) {
         {rows.map((r) => {
           return (
             <div key={r.month}
-              className={`flex items-center gap-3 rounded-xl px-2 py-2 ${r.month === nowMonth ? 'bg-wash' : ''}`}>
-              <span className={`w-9 text-sm ${r.month === nowMonth ? 'font-bold text-water-deep' : 'text-ink/60'}`}>
+              className={`flex items-center gap-2.5 rounded-xl px-2 py-2 ${r.month === nowMonth ? 'bg-wash' : ''}`}>
+              <span className={`h-2 w-2 shrink-0 rounded-full ${r.stage !== 'off' ? stageDot[r.stage] : 'bg-line'}`}
+                title={r.stage !== 'off' ? t('stage_' + r.stage, lang) : t('stage_off', lang)} />
+              <span className={`w-8 text-sm ${r.month === nowMonth ? 'font-bold text-water-deep' : 'text-ink/60'}`}>
                 {monthNames[lang][r.month]}
               </span>
               <div className="h-3.5 flex-1 overflow-hidden rounded-full bg-wash">
@@ -96,13 +118,25 @@ export function CalendarView({ field }: { field: FieldConfig }) {
         })}
       </div>
 
-      {/* stage legend */}
-      <div className="mt-4 flex flex-wrap gap-2">
-        {(['initial', 'development', 'mid', 'late'] as const).map((k) => (
-          <span key={k} className={`rounded-full px-3 py-1 text-xs font-medium ${stageColor[k]}`}>
-            {t('stage_' + k, lang)}
-          </span>
-        ))}
+      {/* stage legend — explains what each phase means and when it happens */}
+      <div className="mt-4 rounded-3xl border border-line bg-card p-5 shadow-sm">
+        <p className="text-xs font-medium uppercase tracking-wide text-water-deep">{t('stageLegendTitle', lang)}</p>
+        <ul className="mt-3 flex flex-col gap-3.5">
+          {ranges.map((r) => (
+            <li key={r.key} className="flex gap-3">
+              <span className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${stageDot[r.key]}`} />
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-ink">
+                  {t('stage_' + r.key, lang)}
+                  <span className="ml-2 text-xs font-normal text-ink/45">
+                    {dayMonth(r.start, lang)} – {dayMonth(r.end, lang)}
+                  </span>
+                </p>
+                <p className="text-xs leading-snug text-ink/60">{t('stageDesc_' + r.key, lang)}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
 
       <div className="mt-5 rounded-2xl bg-water-deep p-5 text-white">

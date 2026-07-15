@@ -10,14 +10,22 @@ const FieldMap = lazy(() => import('./FieldMap'));
 /** Season NDVI trend as a tiny inline SVG line chart (no chart library). */
 function HistorySpark({ history, lang }: { history: { date: string; health: number }[]; lang: 'uz' | 'ru' }) {
   const W = 260, H = 56, PAD = 4;
-  const xs = history.map((_, i) => PAD + (i * (W - 2 * PAD)) / (history.length - 1));
-  const ys = history.map((p) => PAD + (1 - p.health / 100) * (H - 2 * PAD));
+  // Median-of-3 smoothing: a single cloudy/hazy scene shouldn't spike the line
+  // (endpoints stay raw so the last point matches the health score above).
+  const raw = history.map((p) => p.health);
+  const vals = raw.map((v, i) => {
+    if (i === 0 || i === raw.length - 1) return v;
+    return [raw[i - 1], v, raw[i + 1]].sort((a, b) => a - b)[1];
+  });
+  const xs = vals.map((_, i) => PAD + (i * (W - 2 * PAD)) / (vals.length - 1));
+  const ys = vals.map((v) => PAD + (1 - v / 100) * (H - 2 * PAD));
   const line = xs.map((x, i) => `${i ? 'L' : 'M'}${x.toFixed(1)},${ys[i].toFixed(1)}`).join(' ');
   const area = `${line} L${xs[xs.length - 1].toFixed(1)},${H} L${xs[0].toFixed(1)},${H} Z`;
-  // Trend: average of the last two scenes vs the first two.
-  const first = (history[0].health + history[1].health) / 2;
-  const last = (history[history.length - 1].health + history[history.length - 2].health) / 2;
-  const trend = last - first;
+  // Trend over the RECENT scenes (~last 3 weeks), not vs the season start:
+  // early-season bare soil would otherwise make normal growth look like news
+  // and natural ripening look like decline.
+  const k = Math.min(4, vals.length - 1);
+  const trend = vals[vals.length - 1] - vals[vals.length - 1 - k];
   const fmtD = (iso: string) => formatDate(new Date(iso), lang);
   return (
     <div className="mt-4">
