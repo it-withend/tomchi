@@ -1,6 +1,6 @@
 # Tomchi 💧 — aqlli sug'orish yordamchisi
 
-**Umный помощник фермера по поливу** для конкурса [President Tech Award — Incubation Program](https://awards.gov.uz/en/pta/incubation-program).
+**Умный помощник фермера по поливу** для конкурса [President Tech Award — Incubation Program](https://awards.gov.uz/en/pta/incubation-program).
 
 > Har bir tomchi hisobda — каждая капля на счету.
 
@@ -41,7 +41,7 @@ npm run build    # production-сборка в dist/
 
 Vite · React 18 · TypeScript · Tailwind CSS 4. Данные и расчётный движок — `src/data/`, `src/engine/`.
 
-## Дорожная карта (для питча)
+## Дорожная карта
 
 - Интеграция прогноза погоды (реальный ET₀ вместо климатических норм)
 - Фото-диагностика болезней через vision-модель
