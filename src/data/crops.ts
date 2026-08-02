@@ -15,6 +15,14 @@ export interface Crop {
   icon: CropIcon;
   name: { uz: string; ru: string };
   plantMonth: number; // 0-based month when season starts
+  /**
+   * Effective rooting depth in metres, at planting and once fully developed.
+   * FAO-56 Table 22 gives a range; the lower end is used, as that table directs
+   * for irrigated conditions. Drives how much water the root zone can hold.
+   */
+  rootDepth: { start: number; max: number };
+  /** Share of available water the crop may lose before it suffers (FAO-56 `p`). */
+  depletion: number;
   stages: { key: StageKey; days: number; kc: number }[];
   // recommended irrigation interval (days) per stage, by method
   interval: Record<StageKey, { furrow: number; sprinkler: number; drip: number }>;
@@ -34,6 +42,8 @@ export const crops: Crop[] = [
     id: 'cotton',
     emoji: '🌱',
     icon: 'cotton',
+    rootDepth: { start: 0.3, max: 1.0 },
+    depletion: 0.65,
     name: { uz: 'Paxta', ru: 'Хлопчатник' },
     plantMonth: 3, // April
     stages: [
@@ -54,6 +64,8 @@ export const crops: Crop[] = [
     id: 'wheat',
     emoji: '🌾',
     icon: 'wheat',
+    rootDepth: { start: 0.3, max: 1.5 },
+    depletion: 0.55,
     name: { uz: 'Kuzgi bug‘doy', ru: 'Озимая пшеница' },
     plantMonth: 9, // October
     stages: [
@@ -74,6 +86,8 @@ export const crops: Crop[] = [
     id: 'tomato',
     emoji: '🍅',
     icon: 'tomato',
+    rootDepth: { start: 0.25, max: 0.8 },
+    depletion: 0.4,
     name: { uz: 'Pomidor', ru: 'Томаты' },
     plantMonth: 3,
     stages: [
@@ -94,6 +108,8 @@ export const crops: Crop[] = [
     id: 'grapes',
     emoji: '🍇',
     icon: 'grapes',
+    rootDepth: { start: 0.4, max: 1.2 },
+    depletion: 0.35,
     name: { uz: 'Uzum', ru: 'Виноград' },
     plantMonth: 3,
     stages: [
@@ -114,6 +130,8 @@ export const crops: Crop[] = [
     id: 'apple',
     emoji: '🍎',
     icon: 'apple',
+    rootDepth: { start: 0.4, max: 1.2 },
+    depletion: 0.5,
     name: { uz: 'Olma bog‘i', ru: 'Яблоневый сад' },
     plantMonth: 2,
     stages: [
@@ -134,6 +152,8 @@ export const crops: Crop[] = [
     id: 'melon',
     emoji: '🍈',
     icon: 'melon',
+    rootDepth: { start: 0.3, max: 0.9 },
+    depletion: 0.45,
     name: { uz: 'Qovun-tarvuz', ru: 'Дыни и арбузы' },
     plantMonth: 4,
     stages: [
@@ -154,6 +174,8 @@ export const crops: Crop[] = [
     id: 'potato',
     emoji: '🥔',
     icon: 'potato',
+    rootDepth: { start: 0.25, max: 0.5 },
+    depletion: 0.35,
     name: { uz: 'Kartoshka', ru: 'Картофель' },
     plantMonth: 2,
     stages: [

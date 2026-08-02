@@ -4,12 +4,17 @@
 //
 // The client POSTs the raw audio bytes; ?lang=uz|ru hints the language.
 import { cors } from './_ai.mjs';
+import { rateLimit } from './_ratelimit.mjs';
 
 const GROQ_URL = (process.env.AI_BASE_URL || 'https://api.groq.com/openai/v1') + '/audio/transcriptions';
 const WHISPER_MODEL = process.env.AI_WHISPER_MODEL || 'whisper-large-v3';
 
 export default async (req) => {
   if (req.method === 'OPTIONS') return new Response('', { headers: cors });
+
+  // Paid upstream call — cap how fast one caller can spend it.
+  const limited = rateLimit(req, { perMinute: 12, cors });
+  if (limited) return limited;
   const key = process.env.AI_API_KEY;
   if (!key) return new Response(JSON.stringify({ error: 'not_configured' }), { status: 503, headers: cors });
 

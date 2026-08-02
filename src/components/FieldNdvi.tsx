@@ -6,6 +6,7 @@ import { fetchNdvi, type Ndvi } from '../lib/ndvi';
 import { Icon } from './Icon';
 
 const FieldMap = lazy(() => import('./FieldMap'));
+import type { FieldShape } from './FieldMap';
 
 /** Season NDVI trend as a tiny inline SVG line chart (no chart library). */
 function HistorySpark({ history, lang }: { history: { date: string; health: number }[]; lang: 'uz' | 'ru' }) {
@@ -83,8 +84,12 @@ export function FieldNdvi({ field }: { field: FieldConfig }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [field.id, field.lat, field.lng]);
 
-  const saveLoc = (lat: number, lng: number) => {
-    updateField(field.id, { lat, lng });
+  // An outlined field brings its own measured size; a dropped pin only moves
+  // the point we sample the satellite at.
+  const saveLoc = (lat: number, lng: number, shape?: FieldShape) => {
+    updateField(field.id, shape
+      ? { lat, lng, areaHa: shape.areaHa, boundary: shape.boundary }
+      : { lat, lng });
     setShowMap(false);
   };
 
@@ -185,7 +190,7 @@ export function FieldNdvi({ field }: { field: FieldConfig }) {
 
       {showMap && (
         <Suspense fallback={null}>
-          <FieldMap initial={initial} onSave={saveLoc} onClose={() => setShowMap(false)} />
+          <FieldMap initial={initial} initialBoundary={field.boundary} onSave={saveLoc} onClose={() => setShowMap(false)} />
         </Suspense>
       )}
     </section>

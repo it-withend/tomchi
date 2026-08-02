@@ -1,10 +1,15 @@
 import { chat, chatSystemPrompt, TEXT_MODEL, VISION_MODEL, cors } from './_ai.mjs';
+import { rateLimit } from './_ratelimit.mjs';
 
 // Conversational agronomist. Body: { cropId, lang, messages:[{role,text}], image? }.
 // `image` (base64/data URL) attaches to the latest user turn and switches to the
 // vision model. History is trimmed server-side to keep requests small.
 export default async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
+
+  // Paid upstream call — cap how fast one caller can spend it.
+  const limited = rateLimit(req, { perMinute: 12, cors });
+  if (limited) return limited;
   try {
     const { cropId, lang, messages, image } = await req.json();
     const hist = (Array.isArray(messages) ? messages : [])

@@ -21,6 +21,9 @@ export interface FieldConfig {
   soil: Soil;
   lat?: number; // field centre, for satellite (NDVI) health
   lng?: number;
+  /** Corners traced on the map, when the farmer outlined the plot instead of
+   *  typing its size. Kept so the outline can be reopened and corrected. */
+  boundary?: { lat: number; lng: number }[];
   lastWatered?: string; // legacy single date (migrated into log)
   log?: WateringEvent[];
 }

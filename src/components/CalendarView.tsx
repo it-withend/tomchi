@@ -61,7 +61,7 @@ export function CalendarView({ field }: { field: FieldConfig }) {
   const ranges = stageRanges(crop, new Date().getFullYear());
 
   return (
-    <div className="px-5 pb-28 pt-6">
+    <div className="px-5 pb-28 pt-6 lg:max-w-2xl lg:pb-10 lg:pl-0 lg:pr-1 lg:pt-8">
       <h2 className="font-display text-lg font-medium text-ink">{t('seasonCalendar', lang)}</h2>
       <p className="mb-5 flex items-center gap-1.5 text-sm text-ink/60">
         <Icon name={crop.icon} size={16} className="text-water-deep" /> {crop.name[lang]}

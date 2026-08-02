@@ -1,7 +1,12 @@
 import { chat, systemPrompt, VISION_MODEL, cors } from './_ai.mjs';
+import { rateLimit } from './_ratelimit.mjs';
 
 export default async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
+
+  // Paid upstream call — cap how fast one caller can spend it.
+  const limited = rateLimit(req, { perMinute: 6, cors });
+  if (limited) return limited;
   try {
     const { cropId, image, lang } = await req.json();
     if (!image || typeof image !== 'string') {

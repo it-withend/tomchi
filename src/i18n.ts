@@ -238,6 +238,110 @@ export const dict: Dict = {
   },
   help: { uz: 'Yordam', ru: 'Помощь' },
   // Telegram pairing
+  // --- field outline traced on the map ---
+  modePoint: { uz: 'Nuqta', ru: 'Точка' },
+  modeOutline: { uz: 'Chegara', ru: 'Границы' },
+  outlineHint: {
+    uz: 'Dala burchaklarini xaritada belgilang — maydonini o‘zimiz o‘lchaymiz. Kamida 3 nuqta.',
+    ru: 'Отметьте углы поля на карте — площадь измерим сами. Нужно минимум 3 точки.',
+  },
+  cornersShort: { uz: 'nuqta', ru: 'точки' },
+  undoPoint: { uz: 'Orqaga', ru: 'Отменить' },
+  clearPoints: { uz: 'Tozalash', ru: 'Очистить' },
+  saveAreaAs: { uz: 'Saqlash:', ru: 'Сохранить:' },
+  outlineTooBig: {
+    uz: 'Bu juda katta maydon (%s ga dan ortiq). Xaritani yaqinlashtiring va dala chegarasini aniqroq belgilang.',
+    ru: 'Слишком большая площадь (больше %s га). Приблизьте карту и обведите границы поля точнее.',
+  },
+  outlineOnMap: { uz: 'Xaritada chegarasini belgilash', ru: 'Обвести поле на карте' },
+  areaMeasured: { uz: 'Xarita bo‘yicha o‘lchandi', ru: 'Измерено по карте' },
+
+  // --- digital field: moisture, device, irrigation control ---
+  navSections: { uz: 'Bo‘limlar', ru: 'Разделы' },
+  tabControl: { uz: 'Sug‘orish', ru: 'Полив' },
+  moistureLabel: { uz: 'Tuproqdagi namlik', ru: 'Влага в почве' },
+  moistureDry: { uz: 'Tuproq quridi — sug‘orish vaqti', ru: 'Почва пересохла — пора поливать' },
+  moistureOk: { uz: 'Namlik yetarli', ru: 'Влаги достаточно' },
+  moistureDaysLeft: { uz: 'Sug‘orishgacha kun', ru: 'Дней до полива' },
+  rootDepthLabel: { uz: 'Ildiz chuqurligi', ru: 'Глубина корней' },
+  capacityLabel: { uz: 'sig‘imi', ru: 'ёмкость' },
+  metreShort: { uz: 'm', ru: 'м' },
+  mmShort: { uz: 'mm', ru: 'мм' },
+  loading: { uz: 'Yuklanmoqda…', ru: 'Загрузка…' },
+  save: { uz: 'Saqlash', ru: 'Сохранить' },
+
+  controlNeedsCloud: {
+    uz: 'Masofadan boshqarish uchun bulutga ulanish kerak: buyruq telefoningiz o‘chiq bo‘lsa ham dalaga yetib borishi shart.',
+    ru: 'Для удалённого управления нужно подключение к облаку: команда должна дойти до поля, даже когда телефон выключен.',
+  },
+  connectDeviceTitle: { uz: 'Qurilmani ulash', ru: 'Подключить устройство' },
+  connectDeviceIntro: {
+    uz: 'Dalaga o‘rnatiladigan qurilmalar tayyorlanmoqda. Hozircha jarayonni demo rejimda ko‘rishingiz mumkin.',
+    ru: 'Устройства для поля готовятся. Пока можно посмотреть, как это работает, в демо-режиме.',
+  },
+  comingSoon: { uz: 'Tez orada', ru: 'Скоро' },
+  devValve: { uz: 'Klapan boshqaruvi', ru: 'Контроллер клапана' },
+  devValveDesc: { uz: 'Sug‘orishni telefondan ochadi va yopadi', ru: 'Открывает и закрывает полив с телефона' },
+  devMoisture: { uz: 'Namlik datchigi', ru: 'Датчик влажности' },
+  devMoistureDesc: { uz: 'Hisobni o‘lchov bilan almashtiradi', ru: 'Заменяет расчёт фактическим измерением' },
+  devWeather: { uz: 'Meteostansiya', ru: 'Метеостанция' },
+  devWeatherDesc: { uz: 'Ob-havoni viloyat emas, dala bo‘yicha oladi', ru: 'Погода по полю, а не по области' },
+  devCamera: { uz: 'Kamera', ru: 'Камера' },
+  devCameraDesc: { uz: 'Dalani uydan turib ko‘rish', ru: 'Смотреть на поле, не выходя из дома' },
+  tryDemoTitle: { uz: 'Demo rejimda ko‘rish', ru: 'Посмотреть в демо-режиме' },
+  tryDemoBody: {
+    uz: 'Haqiqiy qurilmasiz: dastur sug‘orish jarayonini o‘zi hisoblab boradi. Suv me’yori haqiqiy — FAO-56 bo‘yicha.',
+    ru: 'Без реального устройства: приложение само отсчитывает ход полива. Норма воды настоящая — по FAO-56.',
+  },
+  tryDemoAction: { uz: 'Demo qurilmani ulash', ru: 'Подключить демо-устройство' },
+  connecting: { uz: 'Ulanmoqda…', ru: 'Подключаем…' },
+  connectFailed: {
+    uz: 'Qurilma ulanmadi. Internetni tekshiring yoki keyinroq urinib ko‘ring.',
+    ru: 'Устройство не подключилось. Проверьте интернет или попробуйте позже.',
+  },
+  virtualDevice: { uz: 'Virtual qurilma', ru: 'Виртуальное устройство' },
+  flowLabel: { uz: 'Suv sarfi', ru: 'Расход воды' },
+  flowEditable: { uz: 'keyin o‘zgartirsa bo‘ladi', ru: 'можно изменить позже' },
+  lpm: { uz: 'l/daq', ru: 'л/мин' },
+
+  heatStayInside: {
+    uz: 'Kuchli issiq. Dalaga chiqmang — sug‘orishni shu yerdan boshlang.',
+    ru: 'Опасная жара. Не выходите в поле — запустите полив отсюда.',
+  },
+  recommendedNow: { uz: 'Hozir kerak', ru: 'Нужно сейчас' },
+  minutesOfWatering: { uz: '%s daqiqa sug‘orish', ru: '%s минут полива' },
+  startIrrigation: { uz: 'Hozir sug‘orish', ru: 'Полить сейчас' },
+  startConfirm: {
+    uz: '%s m³ suv, taxminan %s daqiqa. Sug‘orish boshlansinmi?',
+    ru: '%s м³ воды, примерно %s минут. Запустить полив?',
+  },
+  startFailed: {
+    uz: 'Sug‘orishni boshlab bo‘lmadi. Balki sug‘orish allaqachon ketayotgandir.',
+    ru: 'Не удалось запустить полив. Возможно, полив уже идёт.',
+  },
+  sessionClipped: {
+    uz: 'Bir seansda %s soatdan ko‘p sug‘orilmaydi — me’yor to‘liq quyilmaydi, qolganini keyin bering.',
+    ru: 'За один сеанс поливаем не дольше %s часов — норма выльется не полностью, остаток дайте позже.',
+  },
+  irrigationRunning: { uz: 'Sug‘orish ketmoqda', ru: 'Идёт полив' },
+  ofPlanned: { uz: 'rejadagi', ru: 'из запланированных' },
+  minutesLeft: { uz: '%s daqiqa qoldi', ru: 'осталось %s минут' },
+  stopIrrigation: { uz: 'To‘xtatish', ru: 'Остановить' },
+  stopConfirm: {
+    uz: 'Sug‘orish to‘xtatilsinmi? Quyilgan suv hisobga olinadi.',
+    ru: 'Остановить полив? Вылитая вода будет учтена.',
+  },
+  nothingToWater: {
+    uz: 'Hozircha sug‘orish shart emas — tuproqda namlik yetarli.',
+    ru: 'Поливать пока не нужно — влаги в почве достаточно.',
+  },
+  sessionHistory: { uz: 'Sug‘orishlar tarixi', ru: 'История поливов' },
+  stoppedShort: { uz: 'to‘xtatilgan', ru: 'остановлен' },
+
+  aiTooFast: {
+    uz: 'Juda tez-tez so‘ralmoqda. Bir daqiqa kutib, qayta urinib ko‘ring.',
+    ru: 'Слишком часто. Подождите минуту и попробуйте снова.',
+  },
   tgLinked: { uz: 'Telegram ulangan', ru: 'Телеграм подключён' },
   tgLinkedDesc: {
     uz: 'Sug‘orish eslatmalari va ob-havo ogohlantirishlari botga keladi',

@@ -1,10 +1,14 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { useApp } from '../state';
 import { t } from '../i18n';
 import { regions } from '../data/regions';
 import { crops, type Method } from '../data/crops';
 import type { Soil } from '../engine/irrigation';
 import { Icon, type IconName } from './Icon';
+import type { FieldShape } from './FieldMap';
+
+// Heavy (Leaflet); keep it out of the first paint on a rural connection.
+const FieldMap = lazy(() => import('./FieldMap'));
 
 const methods: { id: Method; labelKey: string; descKey: string; icon: IconName }[] = [
   { id: 'furrow', labelKey: 'furrow', descKey: 'furrowDesc', icon: 'furrow' },
@@ -28,6 +32,10 @@ export function Onboarding() {
   const [area, setArea] = useState('1');
   const [method, setMethod] = useState<Method | ''>('');
   const [soil, setSoil] = useState<Soil | ''>('');
+  // Set when the farmer traced the plot instead of typing its size.
+  const [shape, setShape] = useState<FieldShape | null>(null);
+  const [centre, setCentre] = useState<{ lat: number; lng: number } | null>(null);
+  const [showMap, setShowMap] = useState(false);
 
   const areaNum = parseFloat(area.replace(',', '.'));
   const areaOk = !isNaN(areaNum) && areaNum >= 0.01 && areaNum <= 500;
@@ -123,7 +131,9 @@ export function Onboarding() {
               />
               <span className="pb-2 text-lg text-ink/60">{t('hectare', lang)}</span>
             </div>
-            <p className="mt-3 text-sm text-ink/50">{t('areaHint', lang)}</p>
+            <p className="mt-3 text-sm text-ink/50">
+              {shape ? t('areaMeasured', lang) : t('areaHint', lang)}
+            </p>
             <div className="mt-4 flex flex-wrap gap-2">
               {[0.1, 0.5, 1, 2, 5, 10].map((v) => (
                 <button key={v} onClick={() => setArea(String(v))}
@@ -133,6 +143,11 @@ export function Onboarding() {
               ))}
             </div>
           </div>
+          <button onClick={() => setShowMap(true)}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border border-water/40 bg-card py-3.5 text-sm font-medium text-water-deep active:scale-[0.99]">
+            <Icon name="pin" size={17} /> {t('outlineOnMap', lang)}
+          </button>
+
           <button disabled={!areaOk} onClick={() => setStep(4)}
             className="mt-6 w-full rounded-2xl bg-water py-4 font-display text-base font-medium text-white shadow-lg shadow-water/30 disabled:opacity-40">
             {t('next', lang)}
@@ -172,12 +187,35 @@ export function Onboarding() {
             ))}
           </div>
           <button disabled={!method || !soil}
-            onClick={() => addField({ regionId, cropId, areaHa: areaNum, method: method as Method, soil: soil as Soil })}
+            onClick={() => addField({
+              regionId, cropId, areaHa: areaNum,
+              method: method as Method, soil: soil as Soil,
+              ...(centre ?? {}),
+              ...(shape ? { boundary: shape.boundary } : {}),
+            })}
             className="w-full rounded-2xl bg-water py-4 font-display text-base font-medium text-white shadow-lg shadow-water/30 disabled:opacity-40">
             {t('finish', lang)}
           </button>
         </>
       )}
+
+      {showMap && (() => {
+        const r = regions.find((x) => x.id === regionId) ?? regions[0];
+        return (
+          <Suspense fallback={null}>
+            <FieldMap
+              initial={{ lat: centre?.lat ?? r.lat, lng: centre?.lng ?? r.lon, zoom: centre ? 15 : 11 }}
+              initialBoundary={shape?.boundary}
+              onSave={(lat, lng, s) => {
+                setCentre({ lat, lng });
+                if (s) { setShape(s); setArea(String(s.areaHa)); }
+                setShowMap(false);
+              }}
+              onClose={() => setShowMap(false)}
+            />
+          </Suspense>
+        );
+      })()}
     </div>
   );
 }

@@ -9,6 +9,8 @@ import { useForecast } from '../useForecast';
 import { dayFrom, nextRainDay, RAIN_SKIP_MM } from '../engine/weather';
 import { openReport } from '../engine/report';
 import { DropGauge } from './DropGauge';
+import { MoistureBar } from './MoistureGauge';
+import { soilWater } from '../engine/soilWater';
 import { Icon } from './Icon';
 import { FieldNdvi } from './FieldNdvi';
 
@@ -62,10 +64,13 @@ export function Dashboard({ field }: { field: FieldConfig }) {
   // needs acting on today is the only solid one on the screen.
   const urgent = !!next && (next.overdue || next.daysLeft === 0);
 
+  // Computed root-zone moisture — the same balance the control tab acts on.
+  const water = soilWater(field, forecast);
+
   return (
-    <div className="px-5 pb-28 pt-4">
+    <div className="px-5 pb-28 pt-4 lg:pb-10 lg:pl-0 lg:pr-1 lg:pt-8">
       {/* field switcher */}
-      <div className="mb-4 flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label={t('myField', lang)}>
+      <div className="mb-4 flex gap-2 overflow-x-auto pb-1 lg:hidden" role="tablist" aria-label={t('myField', lang)}>
         {fields.map((f) => {
           const c = getCrop(f.cropId);
           const active = f.id === field.id;
@@ -92,6 +97,8 @@ export function Dashboard({ field }: { field: FieldConfig }) {
         </button>
       </div>
 
+      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start lg:gap-6">
+      <div className="lg:contents">
       {/* weather-aware rain advice */}
       {s.inSeason && rainDay && (
         <div className="mb-3 flex items-start gap-3 rounded-2xl border border-water/30 bg-water/5 p-3.5">
@@ -168,6 +175,8 @@ export function Dashboard({ field }: { field: FieldConfig }) {
               </div>
             </div>
 
+            <MoistureBar water={water} />
+
             <div className="mt-3 grid grid-cols-2 gap-2 text-left text-sm">
               <div className="rounded-xl bg-wash px-3 py-2.5">
                 <p className="text-xs text-ink/50">{t('et0Label', lang)}</p>
@@ -184,9 +193,12 @@ export function Dashboard({ field }: { field: FieldConfig }) {
         )}
       </section>
 
+      </div>
+
+      <div className="lg:col-start-2 lg:row-start-1 lg:row-span-2">
       {s.inSeason && (
         <>
-          <div className="ornament my-5" aria-hidden />
+          <div className="ornament my-5 lg:mt-0" aria-hidden />
 
           {/* stage + interval */}
           <section className="grid grid-cols-2 gap-3">
@@ -273,6 +285,9 @@ export function Dashboard({ field }: { field: FieldConfig }) {
           </button>
         )
       )}
+
+      </div>
+      </div>
 
       <p className="mt-8 text-center text-xs leading-relaxed text-ink/40">{t('methodology', lang)}</p>
 

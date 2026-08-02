@@ -53,10 +53,10 @@ export function openReport(field: FieldConfig, lang: Lang) {
   .sub { color: #0f7ba0; font-size: 13px; }
   h2 { font-size: 15px; color: #0a5570; margin: 22px 0 8px; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  td, th { border: 1px solid #d5e5e9; padding: 7px 10px; text-align: left; }
-  th { background: #eef6f7; }
+  td, th { border: 1px solid #dde5f0; padding: 7px 10px; text-align: left; }
+  th { background: #f0f3fa; }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; font-size: 13px; }
-  .grid div { display: flex; justify-content: space-between; border-bottom: 1px dashed #d5e5e9; padding: 5px 0; }
+  .grid div { display: flex; justify-content: space-between; border-bottom: 1px dashed #dde5f0; padding: 5px 0; }
   .big { font-size: 20px; font-weight: 700; color: #0a5570; }
   .foot { margin-top: 28px; font-size: 11px; color: #6b8b93; }
 </style></head><body>

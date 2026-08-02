@@ -76,6 +76,13 @@ export function dayFrom(forecast: Forecast | null, date = new Date()): WeatherDa
 /** Significant rain that should postpone irrigation. */
 export const RAIN_SKIP_MM = 5;
 
+/**
+ * Above this forecast high, working outdoors in open sun stops being merely
+ * unpleasant and becomes a health risk — the point at which starting the
+ * watering from the phone is worth offering instead of walking out to the valve.
+ */
+export const DANGEROUS_HEAT_C = 40;
+
 export function nextRainDay(forecast: Forecast | null): WeatherDay | null {
   if (!forecast) return null;
   const todayIso = new Date().toISOString().slice(0, 10);

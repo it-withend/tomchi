@@ -16,7 +16,7 @@ export function Impact({ field }: { field: FieldConfig }) {
   const isDrip = field.method === 'drip';
 
   return (
-    <div className="px-5 pb-28 pt-6">
+    <div className="px-5 pb-28 pt-6 lg:max-w-2xl lg:pb-10 lg:pl-0 lg:pr-1 lg:pt-8">
       <h2 className="font-display text-lg font-medium text-ink">{t('impactTitle', lang)}</h2>
       <p className="mb-4 text-sm text-ink/60">{t('yourMethod', lang)}: {t(field.method, lang)}</p>
 

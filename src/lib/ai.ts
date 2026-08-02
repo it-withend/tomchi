@@ -1,4 +1,4 @@
-import type { Lang } from '../i18n';
+import { t, type Lang } from '../i18n';
 
 // AI doctor calls Netlify Functions (key stays server-side). Override the base
 // with VITE_AI_URL if you host the functions elsewhere.
@@ -8,12 +8,16 @@ const base = (import.meta.env.VITE_AI_URL as string | undefined) ?? '/.netlify/f
 // friendly error rather than a "not configured" dead end.
 export const aiEnabled = true;
 
-async function callFn(fn: string, body: unknown): Promise<string> {
+/** The server caps how often one caller may spend the paid AI quota. */
+const RATE_LIMITED = 429;
+
+async function callFn(fn: string, body: unknown, lang: Lang): Promise<string> {
   const res = await fetch(`${base}/${fn}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
+  if (res.status === RATE_LIMITED) throw new Error(t('aiTooFast', lang));
   if (!res.ok) throw new Error(`AI error ${res.status}`);
   const json = await res.json();
   if (json.error) throw new Error(json.error);
@@ -21,11 +25,11 @@ async function callFn(fn: string, body: unknown): Promise<string> {
 }
 
 export function diagnoseText(cropId: string, symptoms: string, lang: Lang): Promise<string> {
-  return callFn('diagnose', { cropId, symptoms, lang });
+  return callFn('diagnose', { cropId, symptoms, lang }, lang);
 }
 
 export function diagnosePhoto(cropId: string, imageBase64: string, lang: Lang): Promise<string> {
-  return callFn('diagnose-photo', { cropId, image: imageBase64, lang });
+  return callFn('diagnose-photo', { cropId, image: imageBase64, lang }, lang);
 }
 
 /** Voice → text: sends a recorded audio clip to Whisper, returns the transcript. */
@@ -35,6 +39,7 @@ export async function transcribe(audio: Blob, lang: Lang): Promise<string> {
     headers: { 'Content-Type': audio.type || 'audio/webm' },
     body: audio,
   });
+  if (res.status === RATE_LIMITED) throw new Error(t('aiTooFast', lang));
   if (!res.ok) throw new Error(`STT error ${res.status}`);
   const json = await res.json();
   if (json.error) throw new Error(json.error);
@@ -45,5 +50,5 @@ export interface ChatMsg { role: 'user' | 'assistant'; text: string; image?: str
 
 /** Conversational agronomist: sends recent history + optional photo, gets a reply. */
 export function chatAsk(cropId: string, messages: ChatMsg[], lang: Lang, image?: string): Promise<string> {
-  return callFn('chat', { cropId, lang, messages: messages.map((m) => ({ role: m.role, text: m.text })), image });
+  return callFn('chat', { cropId, lang, messages: messages.map((m) => ({ role: m.role, text: m.text })), image }, lang);
 }
