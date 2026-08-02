@@ -1,5 +1,8 @@
+// Lives here rather than beside the module it tests: Netlify turns every file
+// in netlify/functions into a serverless function, and a name containing a dot
+// ("_ratelimit.test") is rejected, which fails the whole deploy.
 import { describe, it, expect } from 'vitest';
-import { rateLimit, clientIp } from './_ratelimit.mjs';
+import { rateLimit, clientIp } from '../functions/_ratelimit.mjs';
 
 const cors = { 'Content-Type': 'application/json' };
 
