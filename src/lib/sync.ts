@@ -39,6 +39,33 @@ export async function removeFieldRemote(fieldId: string): Promise<void> {
   await supabase.from('fields').delete().eq('owner', user.id).eq('client_id', fieldId);
 }
 
+export interface TelegramLink {
+  chatId: number;
+  lang: string;
+}
+
+/** The Telegram chat this device is linked to, or null when it isn't linked. */
+export async function getTelegramLink(): Promise<TelegramLink | null> {
+  const user = await ensureSession();
+  if (!user || !supabase) return null;
+  const { data, error } = await supabase
+    .from('bot_links')
+    .select('chat_id, lang')
+    .eq('owner', user.id)
+    .maybeSingle();
+  if (error || !data) return null;
+  return { chatId: data.chat_id, lang: data.lang };
+}
+
+/** Drops the Telegram link so reminders stop. Returns whether it worked. */
+export async function unlinkTelegram(): Promise<boolean> {
+  const user = await ensureSession();
+  if (!user || !supabase) return false;
+  const { error } = await supabase.from('bot_links').delete().eq('owner', user.id);
+  if (error) { console.warn('Tomchi unlink (telegram):', error.message); return false; }
+  return true;
+}
+
 /** Creates a 6-digit code linking this device to a Telegram chat via the bot. */
 export async function createPairCode(): Promise<string | null> {
   const user = await ensureSession();

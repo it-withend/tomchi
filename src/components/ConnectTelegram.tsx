@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useApp } from '../state';
 import { t } from '../i18n';
 import { createPairCode } from '../lib/sync';
+import { Icon } from './Icon';
 
 const BOT = 'tomchiaibot';
 
@@ -40,7 +41,11 @@ export function ConnectTelegram({ onClose }: { onClose: () => void }) {
             <button onClick={copy} disabled={!code}
               className="mt-2 flex w-full items-center justify-between rounded-xl border border-water/40 bg-wash px-4 py-3 font-mono text-base font-bold text-water-deep disabled:opacity-50">
               {failed ? t('pairError', lang) : code ? command : t('pairGenerating', lang)}
-              {code && <span className="text-xs font-body font-medium text-water">{copied ? t('copied', lang) : '⧉'}</span>}
+              {code && (
+                <span className="font-body text-xs font-medium text-water">
+                  {copied ? t('copied', lang) : <Icon name="copy" size={16} />}
+                </span>
+              )}
             </button>
             {code && <p className="mt-1 text-xs text-ink/40">{t('pairExpires', lang)}</p>}
           </li>

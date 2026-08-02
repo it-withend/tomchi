@@ -3,6 +3,14 @@ import { getCrop, getRegion, seasonTotals, dayStatus, lastEventDate, SOM_PER_M3,
 
 const methodLabel: Record<string, string> = { furrow: 'furrow', sprinkler: 'sprinkler', drip: 'drip' };
 
+// The report is a standalone HTML document, so it can't import the React Icon
+// component. This is the one glyph it needs, inlined in the same stroke style.
+const RAIN_MARK =
+  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0f7ba0" ' +
+  'stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px">' +
+  '<path d="M7 15a4.5 4.5 0 0 1-.5-9 6 6 0 0 1 11.5 1.5A3.8 3.8 0 0 1 17 15"/>' +
+  '<path d="M8 19l-1 2M12 19l-1 2M16 19l-1 2"/></svg>';
+
 /** Builds a printable HTML report and opens it in a new tab for Save-as-PDF. */
 export function openReport(field: FieldConfig, lang: Lang) {
   const crop = getCrop(field.cropId);
@@ -27,7 +35,7 @@ export function openReport(field: FieldConfig, lang: Lang) {
         vol = st.inSeason ? `${formatNum(m3, lang)} m³` : '—';
       } else {
         rainCount++;
-        vol = '🌧';
+        vol = RAIN_MARK;
       }
       return `<tr><td>${formatDate(new Date(e.date), lang)}</td><td>${e.type === 'rain' ? t('typeRain', lang) : t('typeWatered', lang)}</td><td style="text-align:right">${vol}</td></tr>`;
     })
@@ -61,7 +69,7 @@ export function openReport(field: FieldConfig, lang: Lang) {
   </div>
   <h2>${t('reportField', lang)}</h2>
   <div class="grid">
-    <div><span>${crop.emoji} ${t('stepCrop', lang)}</span><b>${crop.name[lang]}</b></div>
+    <div><span>${t('stepCrop', lang)}</span><b>${crop.name[lang]}</b></div>
     <div><span>${t('stepRegion', lang)}</span><b>${region.name[lang]}</b></div>
     <div><span>${t('stepArea', lang)}</span><b>${formatNum(field.areaHa, lang)} ${t('hectare', lang)}</b></div>
     <div><span>${t('stepMethod', lang)}</span><b>${t(methodLabel[field.method], lang)}</b></div>

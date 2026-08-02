@@ -32,7 +32,8 @@ function HistorySpark({ history, lang }: { history: { date: string; health: numb
       <div className="flex items-center justify-between">
         <p className="text-xs text-ink/50">{t('satHistory', lang)}</p>
         {Math.abs(trend) >= 5 && (
-          <p className={`text-[11px] font-medium ${trend > 0 ? 'text-leaf' : 'text-clay'}`}>
+          <p className={`flex items-center gap-1 text-[11px] font-medium ${trend > 0 ? 'text-leaf' : 'text-indigo'}`}>
+            <Icon name={trend > 0 ? 'growth' : 'decline'} size={13} className="shrink-0" />
             {t(trend > 0 ? 'satHistoryUp' : 'satHistoryDown', lang)}
           </p>
         )}
@@ -52,8 +53,8 @@ function HistorySpark({ history, lang }: { history: { date: string; health: numb
 
 const STATUS = {
   healthy: { key: 'satHealthy', tip: 'satHealthyTip', cls: 'text-leaf', bg: 'bg-leaf-soft' },
-  moderate: { key: 'satModerate', tip: 'satModerateTip', cls: 'text-clay', bg: 'bg-clay-soft' },
-  stressed: { key: 'satStressed', tip: 'satStressedTip', cls: 'text-clay', bg: 'bg-clay-soft' },
+  moderate: { key: 'satModerate', tip: 'satModerateTip', cls: 'text-indigo', bg: 'bg-sky' },
+  stressed: { key: 'satStressed', tip: 'satStressedTip', cls: 'text-indigo', bg: 'bg-sky' },
   nodata: { key: 'satNoData', tip: 'satNoDataTip', cls: 'text-ink/50', bg: 'bg-wash' },
 } as const;
 

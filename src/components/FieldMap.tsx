@@ -75,7 +75,7 @@ export function FieldMap({
         </div>
 
         {gpsError && (
-          <p className="bg-clay-soft px-5 py-2 text-center text-xs text-clay">{t('pickGpsFail', lang)}</p>
+          <p className="flex items-center justify-center gap-1.5 bg-sky px-5 py-2 text-center text-xs text-ink/70"><Icon name="alert" size={13} className="shrink-0" />{t('pickGpsFail', lang)}</p>
         )}
 
         <div className="border-t border-line p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">

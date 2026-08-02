@@ -39,10 +39,10 @@ export default function App() {
     <div className="mx-auto min-h-dvh max-w-md">
       {/* top bar */}
       <header className="flex items-center justify-between px-5 pt-5">
-        <p className="flex items-center gap-2 font-display text-lg font-bold text-water-deep">
-          <img src="/tomchi.png" alt="" className="h-7 w-7 rounded-lg" aria-hidden />
+        <p className="flex items-baseline gap-2 font-display text-lg font-bold text-water-deep">
+          <img src="/tomchi.png" alt="" className="h-7 w-7 self-center rounded-lg" aria-hidden />
           {t('appName', lang)}
-          <span className="align-middle font-body text-[11px] font-normal tracking-wide text-clay">
+          <span className="font-body text-[11px] font-normal tracking-wide text-water-dim">
             {t('tagline', lang)}
           </span>
         </p>

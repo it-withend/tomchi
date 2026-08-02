@@ -67,7 +67,7 @@ export function Onboarding() {
         <div>
           <img src="/tomchi.png" alt="" className="mb-6 h-28 w-28 rounded-3xl shadow-md" aria-hidden />
           <h1 className="font-display text-4xl font-bold leading-tight text-water-deep">{t('appName', lang)}</h1>
-          <p className="mt-1 font-display text-sm text-clay">{t('tagline', lang)}</p>
+          <p className="mt-1 font-display text-sm text-water-dim">{t('tagline', lang)}</p>
           <h2 className="mt-6 text-2xl font-bold leading-snug">{t('welcomeTitle', lang)}</h2>
           <p className="mt-3 leading-relaxed text-ink/70">{t('welcomeBody', lang)}</p>
         </div>
@@ -103,7 +103,7 @@ export function Onboarding() {
               <button key={c.id}
                 onClick={() => { setCropId(c.id); setStep(3); }}
                 className={`flex flex-col items-start gap-1.5 rounded-xl border px-4 py-4 text-left ${cropId === c.id ? 'border-water bg-water text-white' : 'border-line bg-card text-ink'}`}>
-                <span className="text-2xl" aria-hidden>{c.emoji}</span>
+                <Icon name={c.icon} size={26} className="text-water-deep" />
                 <span className="text-sm font-medium leading-tight">{c.name[lang]}</span>
               </button>
             ))}

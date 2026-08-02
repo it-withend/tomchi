@@ -19,7 +19,7 @@ const weekdayNames = {
 const stageDot: Record<StageKey, string> = {
   initial: 'bg-leaf',
   development: 'bg-water',
-  mid: 'bg-clay',
+  mid: 'bg-indigo',
   late: 'bg-ink/40',
 };
 
@@ -63,7 +63,9 @@ export function CalendarView({ field }: { field: FieldConfig }) {
   return (
     <div className="px-5 pb-28 pt-6">
       <h2 className="font-display text-lg font-medium text-ink">{t('seasonCalendar', lang)}</h2>
-      <p className="mb-5 text-sm text-ink/60">{crop.emoji} {crop.name[lang]}</p>
+      <p className="mb-5 flex items-center gap-1.5 text-sm text-ink/60">
+        <Icon name={crop.icon} size={16} className="text-water-deep" /> {crop.name[lang]}
+      </p>
 
       {/* concrete upcoming dates — what a farmer actually asks */}
       {upcoming.length > 0 && (

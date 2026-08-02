@@ -203,8 +203,8 @@ export const dict: Dict = {
   },
   tut2Title: { uz: '«Bugun» — kunlik suv me’yori', ru: '«Сегодня» — норма воды на день' },
   tut2Body: {
-    uz: 'Katta tomchi ichidagi suv — bugungi me’yor. Raqam — dalangizga bugun kerak bo‘lgan suv (litr yoki m³). Sug‘organingizda «Sug‘ordim ✓» tugmasini bosing — keyingi sug‘orishgacha necha kun qolganini ko‘rsatamiz. Yomg‘ir yog‘sa — «Yomg‘ir yog‘di» tugmasini bosing, u sug‘orish o‘rniga o‘tadi.',
-    ru: 'Вода внутри большой капли — сегодняшняя норма. Цифра — сколько воды нужно вашему полю сегодня (в литрах или м³). Полили — нажмите «Полил ✓», и мы покажем, сколько дней до следующего полива. Прошёл дождь — нажмите «Был дождь», он засчитается вместо полива.',
+    uz: 'Katta tomchi ichidagi suv — bugungi me’yor. Raqam — dalangizga bugun kerak bo‘lgan suv (litr yoki m³). Sug‘organingizda «Sug‘ordim» tugmasini bosing — keyingi sug‘orishgacha necha kun qolganini ko‘rsatamiz. Yomg‘ir yog‘sa — «Yomg‘ir yog‘di» tugmasini bosing, u sug‘orish o‘rniga o‘tadi.',
+    ru: 'Вода внутри большой капли — сегодняшняя норма. Цифра — сколько воды нужно вашему полю сегодня (в литрах или м³). Полили — нажмите «Полил», и мы покажем, сколько дней до следующего полива. Прошёл дождь — нажмите «Был дождь», он засчитается вместо полива.',
   },
   tut3Title: { uz: 'Bir nechta dala', ru: 'Несколько полей' },
   tut3Body: {
@@ -238,6 +238,16 @@ export const dict: Dict = {
   },
   help: { uz: 'Yordam', ru: 'Помощь' },
   // Telegram pairing
+  tgLinked: { uz: 'Telegram ulangan', ru: 'Телеграм подключён' },
+  tgLinkedDesc: {
+    uz: 'Sug‘orish eslatmalari va ob-havo ogohlantirishlari botga keladi',
+    ru: 'Напоминания о поливе и погодные алерты приходят в бота',
+  },
+  unlinkTg: { uz: 'Uzish', ru: 'Отвязать' },
+  unlinkTgConfirm: {
+    uz: 'Telegram uzilsin—mi? Eslatmalar kelmay qo‘yadi. Istalgan vaqtda qayta ulashingiz mumkin.',
+    ru: 'Отвязать Телеграм? Напоминания перестанут приходить. Подключить снова можно в любой момент.',
+  },
   connectTg: { uz: 'Telegram-botni ulash', ru: 'Подключить Telegram-бот' },
   connectTgDesc: { uz: 'Sug‘orish eslatmalarini Telegramda oling', ru: 'Получайте напоминания о поливе в Telegram' },
   pairTitle: { uz: 'Telegram’ga ulash', ru: 'Подключение Telegram' },
@@ -343,7 +353,7 @@ export const dict: Dict = {
   satLegendHigh: { uz: 'Zich o‘simlik', ru: 'Густая зелень' },
   satLoading: { uz: 'Sun’iy yo‘ldosh ma’lumoti yuklanmoqda…', ru: 'Загружаем данные спутника…' },
   satHistory: { uz: 'Mavsum dinamikasi', ru: 'Динамика за сезон' },
-  satHistoryUp: { uz: 'Dala yaxshilanmoqda 📈', ru: 'Поле идёт на поправку 📈' },
+  satHistoryUp: { uz: 'Dala yaxshilanmoqda', ru: 'Поле идёт на поправку' },
   satHistoryDown: { uz: 'Holat pasaymoqda — e’tibor bering', ru: 'Состояние снижается — присмотритесь' },
   satError: { uz: 'Hozircha ma’lumot yo‘q. Keyinroq urinib ko‘ring.', ru: 'Данные пока недоступны. Попробуйте позже.' },
   satRefresh: { uz: 'Yangilash', ru: 'Обновить' },

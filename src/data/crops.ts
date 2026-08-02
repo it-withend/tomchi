@@ -2,9 +2,17 @@
 // adapted to Central Asian planting windows.
 export type StageKey = 'initial' | 'development' | 'mid' | 'late';
 
+// Icon name for the web app. Kept as a plain string union (not imported from the
+// Icon component) so the Telegram bot can import this file without pulling React
+// into a Node process. components/Icon.tsx folds these into its own IconName.
+export type CropIcon =
+  | 'cotton' | 'wheat' | 'tomato' | 'grapes' | 'apple' | 'melon' | 'potato';
+
 export interface Crop {
   id: string;
+  /** Telegram-only. Bot messages are plain text, so the app never renders this. */
   emoji: string;
+  icon: CropIcon;
   name: { uz: string; ru: string };
   plantMonth: number; // 0-based month when season starts
   stages: { key: StageKey; days: number; kc: number }[];
@@ -25,6 +33,7 @@ export const crops: Crop[] = [
   {
     id: 'cotton',
     emoji: '🌱',
+    icon: 'cotton',
     name: { uz: 'Paxta', ru: 'Хлопчатник' },
     plantMonth: 3, // April
     stages: [
@@ -44,6 +53,7 @@ export const crops: Crop[] = [
   {
     id: 'wheat',
     emoji: '🌾',
+    icon: 'wheat',
     name: { uz: 'Kuzgi bug‘doy', ru: 'Озимая пшеница' },
     plantMonth: 9, // October
     stages: [
@@ -63,6 +73,7 @@ export const crops: Crop[] = [
   {
     id: 'tomato',
     emoji: '🍅',
+    icon: 'tomato',
     name: { uz: 'Pomidor', ru: 'Томаты' },
     plantMonth: 3,
     stages: [
@@ -82,6 +93,7 @@ export const crops: Crop[] = [
   {
     id: 'grapes',
     emoji: '🍇',
+    icon: 'grapes',
     name: { uz: 'Uzum', ru: 'Виноград' },
     plantMonth: 3,
     stages: [
@@ -101,6 +113,7 @@ export const crops: Crop[] = [
   {
     id: 'apple',
     emoji: '🍎',
+    icon: 'apple',
     name: { uz: 'Olma bog‘i', ru: 'Яблоневый сад' },
     plantMonth: 2,
     stages: [
@@ -120,6 +133,7 @@ export const crops: Crop[] = [
   {
     id: 'melon',
     emoji: '🍈',
+    icon: 'melon',
     name: { uz: 'Qovun-tarvuz', ru: 'Дыни и арбузы' },
     plantMonth: 4,
     stages: [
@@ -139,6 +153,7 @@ export const crops: Crop[] = [
   {
     id: 'potato',
     emoji: '🥔',
+    icon: 'potato',
     name: { uz: 'Kartoshka', ru: 'Картофель' },
     plantMonth: 2,
     stages: [

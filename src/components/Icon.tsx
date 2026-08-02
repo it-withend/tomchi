@@ -1,17 +1,38 @@
 import type { ReactNode } from 'react';
+import type { CropIcon } from '../data/crops';
 
 // One cohesive line-icon set (24x24, currentColor stroke) so every icon in the
-// app shares a style instead of mixed emoji. Icons inherit text color.
+// app shares a style. Nothing in the UI is an emoji: crops, trends and controls
+// all come from here, so they inherit text colour and scale with the type.
+// `CropIcon` is declared in data/crops.ts (a plain string union) so the Telegram
+// bot can import the crop data without pulling in React.
 export type IconName =
+  | CropIcon
   | 'drop' | 'calendar' | 'diagnosis' | 'waves' | 'rain' | 'thermometer'
   | 'check' | 'file' | 'send' | 'sparkles' | 'pool' | 'coins' | 'tap'
   | 'plus' | 'trash' | 'leaf' | 'sun' | 'help' | 'globe' | 'back'
   | 'trophy' | 'calculator' | 'tag' | 'bell' | 'chart' | 'sprout'
   | 'sandy' | 'loam' | 'clay' | 'furrow' | 'sprinkler' | 'droplet-grid'
   | 'user' | 'chevron' | 'growth' | 'satellite' | 'pin'
-  | 'mic' | 'stop' | 'speaker' | 'camera';
+  | 'mic' | 'stop' | 'speaker' | 'camera'
+  | 'close' | 'copy' | 'decline' | 'alert' | 'unlink';
 
 const P: Record<IconName, ReactNode> = {
+  // --- crops: drawn in the same stroke language as the rest of the set ---
+  cotton: <><path d="M12 3.8c1.3 0 2.4.9 2.7 2.1 1.3-.3 2.7.4 3.1 1.8.4 1.4-.4 2.8-1.7 3.2H7.9c-1.3-.4-2.1-1.8-1.7-3.2.4-1.4 1.8-2.1 3.1-1.8.3-1.2 1.4-2.1 2.7-2.1Z" /><path d="M12 10.9V21" /><path d="M12 16.5c-2.3 0-4-1.7-4.2-4 2.3 0 4 1.7 4.2 4Z" /><path d="M12 16.5c2.3 0 4-1.7 4.2-4-2.3 0-4 1.7-4.2 4Z" /></>,
+  wheat: <><path d="M12 21v-8" /><path d="M12 13.4c0-2.1 1.4-3.5 3.5-3.7-.2 2.1-1.5 3.5-3.5 3.7Z" /><path d="M12 13.4c0-2.1-1.4-3.5-3.5-3.7.2 2.1 1.5 3.5 3.5 3.7Z" /><path d="M12 9.6c0-2.1 1.4-3.5 3.5-3.7-.2 2.1-1.5 3.5-3.5 3.7Z" /><path d="M12 9.6c0-2.1-1.4-3.5-3.5-3.7.2 2.1 1.5 3.5 3.5 3.7Z" /><path d="M12 5.8c0-2.1 1.4-3.5 3.5-3.7-.2 2.1-1.5 3.5-3.5 3.7Z" /><path d="M12 5.8c0-2.1-1.4-3.5-3.5-3.7.2 2.1 1.5 3.5 3.5 3.7Z" /></>,
+  tomato: <><circle cx="12" cy="14.5" r="6.2" /><path d="M12 8.3V5.2" /><path d="M12 8.3c-1.4-1.6-3.2-2-5.2-1.2.6 2 2.3 3 5.2 1.2Z" /><path d="M12 8.3c1.4-1.6 3.2-2 5.2-1.2-.6 2-2.3 3-5.2 1.2Z" /></>,
+  grapes: <><path d="M12 3v2.8" /><path d="M12.4 5.4c1.3-1.4 2.9-1.8 4.8-1.2-.5 1.9-2 2.9-4.8 1.2Z" /><circle cx="9.7" cy="10.2" r="2.05" /><circle cx="14.3" cy="10.2" r="2.05" /><circle cx="12" cy="13.6" r="2.05" /><circle cx="9.7" cy="17" r="2.05" /><circle cx="14.3" cy="17" r="2.05" /></>,
+  apple: <><path d="M12 8.6c-1.3-1.4-3.3-1.8-4.9-.7C5.4 9 4.7 11.2 5.2 13.5c.6 3.1 3.1 6.4 5.2 7.3.9.4 2.2.4 3.1 0 2.1-.9 4.6-4.2 5.2-7.3.5-2.3-.2-4.5-1.9-5.6-1.6-1.1-3.6-.7-4.9.7Z" /><path d="M12 8.6V5" /><path d="M12.2 6.4c1.6-.2 2.7-1.2 3-3-1.9.1-3 1.1-3 3Z" /></>,
+  melon: <><ellipse cx="12" cy="13.6" rx="8" ry="6.6" /><path d="M12 7v13.2" /><path d="M6.6 8.9c1.7 3 1.7 6.4 0 9.4" /><path d="M17.4 8.9c-1.7 3-1.7 6.4 0 9.4" /><path d="M12 7V4.4" /></>,
+  potato: <><path d="M4.7 13.9c-1.1-3.5 1.2-6.9 4.9-7.8 3.1-.8 5.4.3 7.7 1.5 2.5 1.3 3.6 4 2.5 6.7-1.2 2.9-4.3 4.8-7.9 4.8-3.8 0-6.4-2-7.2-5.2Z" /><path d="M9.4 11.6v.01" /><path d="M13.4 10.1v.01" /><path d="M12.4 14.9v.01" /><path d="M16.2 13.4v.01" /></>,
+
+  close: <path d="M6 6l12 12M18 6L6 18" />,
+  copy: <><rect x="9" y="9" width="11" height="11" rx="2" /><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" /></>,
+  decline: <><path d="M3 3v18h18" /><path d="M7 9l4 4 3-3 6 7" /></>,
+  alert: <><path d="M12 3.5 2.5 20h19L12 3.5Z" /><path d="M12 10v4M12 17.4v.01" /></>,
+  unlink: <><path d="M9 17H7A5 5 0 0 1 7 7" /><path d="M15 7h2a5 5 0 0 1 4 8" /><path d="M8 12h4" /><path d="M3 3l18 18" /></>,
+
   drop: <path d="M12 3s6.5 6.8 6.5 11.2A6.5 6.5 0 0 1 5.5 14.2C5.5 9.8 12 3 12 3Z" />,
   'droplet-grid': <><path d="M12 3s6.5 6.8 6.5 11.2A6.5 6.5 0 0 1 5.5 14.2C5.5 9.8 12 3 12 3Z" /><path d="M9 14.5a3 3 0 0 0 3 3" /></>,
   calendar: <><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M3 9h18M8 3v4M16 3v4" /></>,

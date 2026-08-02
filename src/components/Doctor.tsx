@@ -105,7 +105,7 @@ export function Doctor({ field }: { field: FieldConfig }) {
           <span className="grid h-9 w-9 place-items-center rounded-full bg-water/10 text-water-deep"><Icon name="sparkles" size={18} /></span>
           <div>
             <h2 className="font-display text-base font-medium leading-tight text-ink">{t('chatTitle', lang)}</h2>
-            <p className="text-xs text-ink/50">{crop.emoji} {crop.name[lang]}</p>
+            <p className="flex items-center gap-1.5 text-xs text-ink/50"><Icon name={crop.icon} size={14} />{crop.name[lang]}</p>
           </div>
         </div>
         {messages.length > 0 && (
@@ -166,7 +166,7 @@ export function Doctor({ field }: { field: FieldConfig }) {
             </div>
           </div>
         )}
-        {error && <p className="rounded-2xl bg-clay-soft p-3 text-center text-sm text-clay">{error}</p>}
+        {error && <p className="flex items-center justify-center gap-2 rounded-2xl bg-sky p-3 text-center text-sm text-ink/75"><Icon name="alert" size={15} className="shrink-0" />{error}</p>}
         {messages.length > 0 && !loading && (
           <p className="pt-1 text-center text-[11px] text-ink/40">{t('aiDisclaimer', lang)}</p>
         )}
@@ -185,18 +185,18 @@ export function Doctor({ field }: { field: FieldConfig }) {
           <div className="mb-2 flex items-center gap-2 rounded-full bg-card/95 px-3 py-1.5 text-xs text-ink/60 shadow-sm backdrop-blur">
             <img src={pending} alt="" className="h-7 w-7 rounded-md object-cover" />
             {t('photoAttached', lang)}
-            <button onClick={() => setPending(null)} className="ml-auto text-ink/40" aria-label={t('close', lang)}>✕</button>
+            <button onClick={() => setPending(null)} className="ml-auto text-ink/40" aria-label={t('close', lang)}><Icon name="close" size={14} /></button>
           </div>
         )}
         {/* voice status / error */}
         {(voice.status !== 'idle' || voice.error) && (
           <div className={`mb-2 flex items-center gap-2 rounded-full px-3 py-1.5 text-xs shadow-sm backdrop-blur ${
-            voice.error ? 'bg-clay-soft text-clay' : 'bg-card/95 text-water-deep'}`}>
-            {voice.status === 'listening' && <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-clay" />}
+            voice.error ? 'bg-sky text-ink/75' : 'bg-card/95 text-water-deep'}`}>
+            {voice.status === 'listening' && <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-water" />}
             {voice.error
               ? t(voice.error === 'denied' ? 'voiceDenied' : 'voiceError', lang)
               : t(voice.status === 'listening' ? 'voiceListening' : 'voiceTranscribing', lang)}
-            {voice.error && <button onClick={voice.clearError} className="ml-auto text-clay/60" aria-label={t('close', lang)}>✕</button>}
+            {voice.error && <button onClick={voice.clearError} className="ml-auto text-ink/45" aria-label={t('close', lang)}><Icon name="close" size={13} /></button>}
           </div>
         )}
         <div className="flex items-end gap-2 rounded-3xl border border-line bg-card p-1.5 shadow-lg shadow-ink/5">
@@ -208,7 +208,7 @@ export function Doctor({ field }: { field: FieldConfig }) {
             <button onClick={voice.toggle} disabled={voice.status === 'working'}
               aria-label={t(voice.status === 'listening' ? 'voiceStop' : 'voiceStart', lang)}
               className={`grid h-10 w-10 shrink-0 place-items-center rounded-full disabled:opacity-50 ${
-                voice.status === 'listening' ? 'animate-pulse bg-clay text-white' : 'text-water-deep hover:bg-wash'}`}>
+                voice.status === 'listening' ? 'animate-pulse bg-water-deep text-white' : 'text-water-deep hover:bg-wash'}`}>
               <Icon name={voice.status === 'listening' ? 'stop' : 'mic'} size={20} />
             </button>
           )}
@@ -253,8 +253,8 @@ function SymptomTree({ field }: { field: FieldConfig }) {
   if (node.result) {
     return (
       <div>
-        <div className="rounded-3xl border border-clay/30 bg-clay-soft p-5">
-          <p className="text-xs font-medium uppercase tracking-wide text-clay">{t('diagnosis', lang)}</p>
+        <div className="rounded-3xl border border-indigo/25 bg-sky p-5">
+          <p className="text-xs font-medium uppercase tracking-wide text-indigo">{t('diagnosis', lang)}</p>
           <p className="mt-1 font-display text-xl font-medium text-ink">{node.result.name[lang]}</p>
         </div>
         <div className="mt-3 rounded-3xl border border-line bg-card p-5">
