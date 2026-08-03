@@ -80,7 +80,7 @@ export function NationalImpact() {
         ) : (
           <>
             <p className="mt-1 font-display text-4xl font-bold tabular-nums">
-              {formatNum(Math.round(animated), lang)} <span className="text-2xl">m³</span>
+              {formatNum(Math.round(animated), lang)} <span className="text-2xl">{t('m3', lang)}</span>
             </p>
             <p className="mt-0.5 flex items-center gap-1.5 text-sm opacity-80">
               <Icon name="coins" size={15} /> {formatNum(data!.totalMoney, lang)} {t('som', lang)} · {t('nationalGrowing', lang)}
@@ -157,10 +157,10 @@ export function NationalImpact() {
         {/* selection detail / hint */}
         <div className="mt-2 min-h-[2.5rem] rounded-2xl bg-wash px-4 py-2 text-sm">
           {!selected ? (
-            <span className="flex items-center gap-1.5 text-ink/50"><Icon name="tap" size={15} /> {t('mapTapHint', lang)}</span>
+            <span className="flex items-center gap-1.5 text-ink/50"><Icon name="touch" size={15} /> {t('mapTapHint', lang)}</span>
           ) : sel ? (
             <span className="flex items-center gap-1.5 text-ink">
-              <b>{nameOf(selected, lang)}</b> — <Icon name="drop" size={14} className="text-water" /> {formatNum(sel.saved, lang)} m³ · {formatNum(sel.count, lang)} {t('regionFields', lang)}
+              <b>{nameOf(selected, lang)}</b> — <Icon name="drop" size={14} className="text-water" /> {formatNum(sel.saved, lang)} {t('m3', lang)} · {formatNum(sel.count, lang)} {t('regionFields', lang)}
             </span>
           ) : (
             <span className="text-ink/60"><b>{nameOf(selected, lang)}</b> — {t('regionNoData', lang)}</span>

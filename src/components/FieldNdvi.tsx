@@ -124,28 +124,36 @@ export function FieldNdvi({ field }: { field: FieldConfig }) {
         </div>
       ) : (
         <div className="px-5 pb-5 pt-4">
-          {/* satellite plot */}
-          <div className="relative mx-auto aspect-square w-full max-w-[280px] overflow-hidden rounded-2xl bg-wash">
-            {data?.img ? (
-              <img src={data.img} alt={t('satTitle', lang)} className="h-full w-full object-cover" />
-            ) : (
-              <div className="grid h-full place-items-center text-xs text-ink/40">
-                {loading ? t('satLoading', lang) : failed ? t('satError', lang) : ''}
+          {/* The plot and its colour key exist to explain an image. With no
+              image there is nothing to explain, so a failed load collapses to
+              the single message below instead of a large empty square
+              captioned with the same sentence twice. */}
+          {(data?.img || loading) && (
+            <>
+              {/* satellite plot */}
+              <div className="relative mx-auto aspect-square w-full max-w-[280px] overflow-hidden rounded-2xl bg-wash">
+                {data?.img ? (
+                  <img src={data.img} alt={t('satTitle', lang)} className="h-full w-full object-cover" />
+                ) : (
+                  <div className="grid h-full place-items-center text-xs text-ink/40">{t('satLoading', lang)}</div>
+                )}
+                {/* centre reticle marking the field */}
+                {data?.img && (
+                  <div className="pointer-events-none absolute left-1/2 top-1/2 h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white/90 shadow" />
+                )}
               </div>
-            )}
-            {/* centre reticle marking the field */}
-            {data?.img && (
-              <div className="pointer-events-none absolute left-1/2 top-1/2 h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white/90 shadow" />
-            )}
-          </div>
 
-          {/* legend */}
-          <div className="mx-auto mt-2 flex max-w-[280px] items-center gap-2 text-[10px] text-ink/50">
-            <span>{t('satLegendLow', lang)}</span>
-            <span className="h-2 flex-1 rounded-full"
-              style={{ background: 'linear-gradient(90deg,#c7733a,#e69e47,#f5db61,#99cc52,#4da842,#1f7a33)' }} />
-            <span>{t('satLegendHigh', lang)}</span>
-          </div>
+              {/* legend */}
+              {data?.img && (
+                <div className="mx-auto mt-2 flex max-w-[280px] items-center gap-2 text-[10px] text-ink/50">
+                  <span>{t('satLegendLow', lang)}</span>
+                  <span className="h-2 flex-1 rounded-full"
+                    style={{ background: 'linear-gradient(90deg,#c7733a,#e69e47,#f5db61,#99cc52,#4da842,#1f7a33)' }} />
+                  <span>{t('satLegendHigh', lang)}</span>
+                </div>
+              )}
+            </>
+          )}
 
           {/* health readout */}
           {data && data.status !== 'nodata' ? (

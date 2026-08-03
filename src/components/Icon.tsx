@@ -9,7 +9,7 @@ import type { CropIcon } from '../data/crops';
 export type IconName =
   | CropIcon
   | 'drop' | 'calendar' | 'diagnosis' | 'waves' | 'rain' | 'thermometer'
-  | 'check' | 'file' | 'send' | 'sparkles' | 'pool' | 'coins' | 'tap'
+  | 'check' | 'file' | 'send' | 'sparkles' | 'pool' | 'coins' | 'tap' | 'touch'
   | 'plus' | 'trash' | 'leaf' | 'sun' | 'help' | 'globe' | 'back'
   | 'trophy' | 'calculator' | 'tag' | 'bell' | 'chart' | 'sprout'
   | 'sandy' | 'loam' | 'clay' | 'furrow' | 'sprinkler' | 'droplet-grid'
@@ -46,7 +46,12 @@ const P: Record<IconName, ReactNode> = {
   sparkles: <><path d="M12 3l1.7 4.6L18 9.3l-4.3 1.7L12 15.6l-1.7-4.6L6 9.3l4.3-1.7L12 3Z" /><path d="M18.5 14.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7.7-1.8Z" /></>,
   pool: <><path d="M2 14c2-2 4-2 6 0s4 2 6 0 4-2 6 0" /><path d="M2 19c2-2 4-2 6 0s4 2 6 0 4-2 6 0" /><path d="M7 12V5M17 12V5M7 8h10" /></>,
   coins: <><ellipse cx="8" cy="7" rx="5" ry="2.5" /><path d="M3 7v5c0 1.4 2.2 2.5 5 2.5s5-1.1 5-2.5V7" /><path d="M11 15.2c.6 1.2 2.6 2.1 5 2.1 2.8 0 5-1.1 5-2.5v-5c0-1.3-1.9-2.3-4.4-2.5" /></>,
-  tap: <><circle cx="12" cy="12" r="3" /><path d="M12 4V6M12 18v2M4 12h2M18 12h2M6.3 6.3l1.4 1.4M16.3 16.3l1.4 1.4M17.7 6.3l-1.4 1.4M7.7 16.3l-1.4 1.4" /></>,
+  // An outdoor tap seen from the side: inlet pipe, handle, spout, and water
+  // leaving it. It used to be a second copy of `sun`, which put a sunburst on
+  // the irrigation tab and on the valve controller.
+  tap: <><path d="M3.5 8.5h7.5a3.5 3.5 0 0 1 3.5 3.5v1.5" /><path d="M7.5 8.5V5M5 5h5" /><path d="M14.5 17.5v1.5M14.5 21v.5" /></>,
+  // A finger pressing: "tap the map", a different verb from the tap above.
+  touch: <><path d="M9.5 13.5V4.75a1.75 1.75 0 0 1 3.5 0V11" /><path d="M13 10.5a1.75 1.75 0 0 1 3.5 0V12" /><path d="M16.5 11.5a1.75 1.75 0 0 1 3.5 0V15a6.5 6.5 0 0 1-6.5 6.5h-1a5.5 5.5 0 0 1-3.9-1.6l-3.4-3.4a1.75 1.75 0 0 1 2.5-2.5l1.8 1.8" /></>,
   plus: <path d="M12 5v14M5 12h14" />,
   trash: <path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M6 6l1 14a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-14M10 11v6M14 11v6" />,
   leaf: <><path d="M4 20c0-8 6-13 16-13 0 10-6 15-16 13Z" /><path d="M4 20c3-6 7-9 12-10" /></>,

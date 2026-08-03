@@ -23,7 +23,7 @@ export function Impact({ field }: { field: FieldConfig }) {
       {/* one compact benefit card */}
       <div className="rounded-3xl bg-water-deep p-6 text-white">
         <p className="text-sm opacity-80">{t('waterSavedSeason', lang)}</p>
-        <p className="mt-1 font-display text-4xl font-bold">{formatNum(tot.m3Saved, lang)} <span className="text-2xl">m³</span></p>
+        <p className="mt-1 font-display text-4xl font-bold">{formatNum(tot.m3Saved, lang)} <span className="text-2xl">{t('m3', lang)}</span></p>
         <p className="mt-0.5 text-sm opacity-80">{t('vsFlood', lang)}</p>
 
         <div className="mt-4 flex flex-wrap items-center gap-2">

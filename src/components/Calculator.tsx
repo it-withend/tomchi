@@ -71,7 +71,7 @@ export function Calculator({ field, onClose }: { field: FieldConfig; onClose: ()
             </div>
           </div>
           <p className="mt-3 flex items-center gap-1.5 text-xs opacity-80">
-            <Icon name="drop" size={13} /> {t('calcSaveWater', lang)}: {formatNum(waterSaved, lang)} m³ / {t('perSeason', lang)}
+            <Icon name="drop" size={13} /> {t('calcSaveWater', lang)}: {formatNum(waterSaved, lang)} {t('m3', lang)} / {t('perSeason', lang)}
           </p>
         </div>
       </div>

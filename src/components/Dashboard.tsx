@@ -265,7 +265,7 @@ export function Dashboard({ field }: { field: FieldConfig }) {
               <p className="mt-1 font-medium">{fmt(t('everyNDays', lang), s.intervalDays)}</p>
               <p className="mt-2 text-xs text-ink/50">{t('waterPerIrrigation', lang)}</p>
               <p className="text-sm font-medium text-water-deep">
-                {formatNum(s.litersPerIrrigation / 1000, lang)} m³
+                {formatNum(s.litersPerIrrigation / 1000, lang)} {t('m3', lang)}
               </p>
             </div>
           </section>

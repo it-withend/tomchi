@@ -80,7 +80,7 @@ export function CalendarView({ field }: { field: FieldConfig }) {
                     <Icon name="drop" size={15} /> {dateLabel(d, lang)}
                   </span>
                   <span className={`text-sm ${i === 0 ? 'text-white/80' : 'text-ink/60'}`}>
-                    {formatNum(st.litersPerIrrigation / 1000, lang)} m³
+                    {formatNum(st.litersPerIrrigation / 1000, lang)} {t('m3', lang)}
                   </span>
                 </li>
               );
@@ -143,7 +143,7 @@ export function CalendarView({ field }: { field: FieldConfig }) {
 
       <div className="mt-5 rounded-2xl bg-water-deep p-5 text-white">
         <p className="text-sm opacity-80">{t('seasonTotal', lang)} · {t('forYourField', lang)}</p>
-        <p className="mt-1 font-display text-3xl font-bold">{formatNum(total, lang)} m³</p>
+        <p className="mt-1 font-display text-3xl font-bold">{formatNum(total, lang)} {t('m3', lang)}</p>
         <p className="mt-0.5 text-sm opacity-80">
           {formatNum(field.areaHa, lang)} {t('hectare', lang)}
         </p>

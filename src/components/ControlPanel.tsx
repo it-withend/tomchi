@@ -133,10 +133,10 @@ export function ControlPanel({ field }: { field: FieldConfig }) {
         <section className="mt-4 rounded-3xl bg-water-deep p-5 text-white">
           <p className="text-xs uppercase tracking-wide text-white/70">{t('irrigationRunning', lang)}</p>
           <p className="mt-1 font-display text-3xl font-bold tnum">
-            {formatNum(active.deliveredLiters / 1000, lang)} m³
+            {formatNum(active.deliveredLiters / 1000, lang)} {t('m3', lang)}
           </p>
           <p className="text-sm text-white/75">
-            {t('ofPlanned', lang)} {formatNum(active.session.plannedLiters / 1000, lang)} m³
+            {t('ofPlanned', lang)} {formatNum(active.session.plannedLiters / 1000, lang)} {t('m3', lang)}
           </p>
 
           <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/25">
@@ -160,7 +160,7 @@ export function ControlPanel({ field }: { field: FieldConfig }) {
             <>
               <p className="text-xs text-ink/50">{t('recommendedNow', lang)}</p>
               <p className="mt-1 font-display text-3xl font-bold tnum text-water-deep">
-                {formatNum(liters / 1000, lang)} m³
+                {formatNum(liters / 1000, lang)} {t('m3', lang)}
               </p>
               <p className="text-sm text-ink/60">≈ {fmt(t('minutesOfWatering', lang), String(minutes))}</p>
 
@@ -217,7 +217,7 @@ export function ControlPanel({ field }: { field: FieldConfig }) {
                   {formatDate(new Date(s.startedAt), lang)}
                 </span>
                 <span className="tnum text-ink/55">
-                  {formatNum((s.deliveredLiters ?? s.plannedLiters) / 1000, lang)} m³
+                  {formatNum((s.deliveredLiters ?? s.plannedLiters) / 1000, lang)} {t('m3', lang)}
                   {s.status === 'stopped' && ` · ${t('stoppedShort', lang)}`}
                 </span>
               </li>

@@ -32,7 +32,7 @@ export function openReport(field: FieldConfig, lang: Lang) {
         wateredCount++;
         const m3 = st.inSeason ? st.litersPerIrrigation / 1000 : 0;
         totalApplied += m3;
-        vol = st.inSeason ? `${formatNum(m3, lang)} m³` : '—';
+        vol = st.inSeason ? `${formatNum(m3, lang)} ${t('m3', lang)}` : '—';
       } else {
         rainCount++;
         vol = RAIN_MARK;
@@ -79,15 +79,15 @@ export function openReport(field: FieldConfig, lang: Lang) {
 
   <h2>${t('reportSeasonNeed', lang)}</h2>
   <div class="grid">
-    <div><span>${t('seasonTotal', lang)}</span><b class="big">${formatNum(tot.m3Field, lang)} m³</b></div>
-    <div><span>${t('waterSavedSeason', lang)} (${t('vsFlood', lang)})</span><b>${formatNum(tot.m3Saved, lang)} m³</b></div>
+    <div><span>${t('seasonTotal', lang)}</span><b class="big">${formatNum(tot.m3Field, lang)} ${t('m3', lang)}</b></div>
+    <div><span>${t('waterSavedSeason', lang)} (${t('vsFlood', lang)})</span><b>${formatNum(tot.m3Saved, lang)} ${t('m3', lang)}</b></div>
   </div>
 
   <h2>${t('reportUsage', lang)}</h2>
   <div class="grid">
     <div><span>${t('reportWaterings', lang)}</span><b>${wateredCount}</b></div>
     <div><span>${t('reportRains', lang)}</span><b>${rainCount}</b></div>
-    <div><span>${t('reportApplied', lang)}</span><b class="big">${formatNum(totalApplied, lang)} m³</b></div>
+    <div><span>${t('reportApplied', lang)}</span><b class="big">${formatNum(totalApplied, lang)} ${t('m3', lang)}</b></div>
     <div><span>${t('reportSavedMoney', lang)}</span><b>${formatNum(tot.m3Saved * SOM_PER_M3, lang)} ${t('som', lang)}</b></div>
   </div>
 

@@ -40,6 +40,9 @@ export const dict: Dict = {
   perDay: { uz: 'kuniga', ru: 'в день' },
   litersPerDay: { uz: 'litr / kun', ru: 'литров / день' },
   litersShort: { uz: 'l', ru: 'л' },
+  // The unit itself is transliterated, so a Russian screen never mixes the two
+  // alphabets on one line ("705 м³" beside "4 630 m³").
+  m3: { uz: 'm³', ru: 'м³' },
   m3PerDay: { uz: 'm³ / kun', ru: 'м³ / день' },
   stageNow: { uz: 'Hozirgi bosqich', ru: 'Текущая фаза' },
   nextWatering: { uz: 'Keyingi sug‘orish', ru: 'Следующий полив' },
