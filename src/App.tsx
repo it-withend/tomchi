@@ -1,16 +1,22 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { useApp } from './state';
 import { t, formatNum } from './i18n';
 import { Onboarding } from './components/Onboarding';
 import { Dashboard } from './components/Dashboard';
-import { CalendarView } from './components/CalendarView';
 import { ControlPanel } from './components/ControlPanel';
-import { Doctor } from './components/Doctor';
-import { Impact } from './components/Impact';
 import { Tutorial } from './components/Tutorial';
 import { Splash } from './components/Splash';
 import { getCrop } from './engine/irrigation';
 import { Icon, type IconName } from './components/Icon';
+
+// Today and the irrigation control are the reason the app is opened, so they
+// ship in the first bundle. The other three are a tap away and each drags
+// something bulky behind it — the chat transcript and photo pipeline, the month
+// tables, the outline map of Uzbekistan — which a farmer on a rural connection
+// should not have to wait for before seeing today's water figure.
+const CalendarView = lazy(() => import('./components/CalendarView').then((m) => ({ default: m.CalendarView })));
+const Doctor = lazy(() => import('./components/Doctor').then((m) => ({ default: m.Doctor })));
+const Impact = lazy(() => import('./components/Impact').then((m) => ({ default: m.Impact })));
 
 type Tab = 'today' | 'control' | 'calendar' | 'agronom' | 'impact';
 
@@ -21,6 +27,17 @@ const tabs: { id: Tab; labelKey: string; icon: IconName }[] = [
   { id: 'agronom', labelKey: 'tabAgronom', icon: 'sparkles' },
   { id: 'impact', labelKey: 'tabImpact', icon: 'waves' },
 ];
+
+/** Placeholder while a tab's chunk arrives: card-shaped, so the page does not
+ *  jump when the real content replaces it. */
+function TabLoading() {
+  return (
+    <div className="px-5 pt-5" aria-hidden>
+      <div className="h-40 animate-pulse rounded-3xl border border-line bg-card" />
+      <div className="mt-4 h-24 animate-pulse rounded-3xl border border-line bg-card" />
+    </div>
+  );
+}
 
 export default function App() {
   const {
@@ -141,9 +158,11 @@ export default function App() {
         <main>
           {tab === 'today' && <Dashboard field={activeField} />}
           {tab === 'control' && <ControlPanel key={activeField.id} field={activeField} />}
-          {tab === 'calendar' && <CalendarView field={activeField} />}
-          {tab === 'agronom' && <Doctor key={activeField.id + activeField.cropId} field={activeField} />}
-          {tab === 'impact' && <Impact field={activeField} />}
+          <Suspense fallback={<TabLoading />}>
+            {tab === 'calendar' && <CalendarView field={activeField} />}
+            {tab === 'agronom' && <Doctor key={activeField.id + activeField.cropId} field={activeField} />}
+            {tab === 'impact' && <Impact field={activeField} />}
+          </Suspense>
         </main>
       </div>
 

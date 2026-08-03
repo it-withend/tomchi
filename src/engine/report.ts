@@ -11,8 +11,13 @@ const RAIN_MARK =
   '<path d="M7 15a4.5 4.5 0 0 1-.5-9 6 6 0 0 1 11.5 1.5A3.8 3.8 0 0 1 17 15"/>' +
   '<path d="M8 19l-1 2M12 19l-1 2M16 19l-1 2"/></svg>';
 
-/** Builds a printable HTML report and opens it in a new tab for Save-as-PDF. */
-export function openReport(field: FieldConfig, lang: Lang) {
+/**
+ * Builds the printable report as a standalone HTML document.
+ *
+ * Separate from printing it so the figures a farmer hands to the hokimiyat can
+ * be checked without a browser.
+ */
+export function buildReportHtml(field: FieldConfig, lang: Lang): string {
   const crop = getCrop(field.cropId);
   const region = getRegion(field.regionId);
   const tot = seasonTotals(field);
@@ -97,6 +102,13 @@ export function openReport(field: FieldConfig, lang: Lang) {
 
   <p class="foot">${t('methodology', lang)}<br>${t('reportGenerated', lang)}: ${formatDate(new Date(), lang)} · awards.gov.uz/pta</p>
 </body></html>`;
+
+  return html;
+}
+
+/** Builds the report and opens the print dialog on it for Save-as-PDF. */
+export function openReport(field: FieldConfig, lang: Lang) {
+  const html = buildReportHtml(field, lang);
 
   // Print via a hidden same-origin iframe. A popup (window.open) gets silently
   // blocked by browsers, and an inline onclick="print()" is blocked by our CSP
