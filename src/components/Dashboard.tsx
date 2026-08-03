@@ -89,17 +89,37 @@ export function Dashboard({ field }: { field: FieldConfig }) {
         </button>
       </div>
 
-      <div className="mb-4 flex items-center justify-between">
-        <p className="text-sm text-ink/60">{region.name[lang]}</p>
-        <button onClick={() => { if (window.confirm(t('deleteField', lang) + '?')) removeField(field.id); }}
-          className="flex items-center gap-1 text-xs font-medium text-ink/45 transition-colors hover:text-ink/75">
-          <Icon name="trash" size={13} /> {t('deleteField', lang)}
-        </button>
+      {/* Which field am I looking at? The phone answers that with the chips
+          above; the sidebar hides them, so the desktop needs a real page head. */}
+      <div className="mb-4 flex items-start justify-between gap-4 lg:mb-7">
+        <div className="min-w-0">
+          <h1 className="hidden items-center gap-2.5 font-display text-2xl font-bold text-ink lg:flex">
+            <Icon name={crop.icon} size={24} className="shrink-0 text-water" />
+            {crop.name[lang]}
+          </h1>
+          <p className="text-sm text-ink/60 lg:mt-1.5 lg:pl-9">
+            {region.name[lang]}
+            <span className="hidden lg:inline">
+              {' · '}{formatNum(field.areaHa, lang)} {t('hectare', lang)}
+              {s.inSeason && <>{' · '}{t('stage_' + s.stage, lang)}</>}
+            </span>
+          </p>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          <button onClick={() => openReport(field, lang)}
+            className="hidden items-center gap-1.5 rounded-full border border-line bg-card px-3 py-1.5 text-xs font-medium text-water-deep transition-colors hover:border-water/50 lg:inline-flex">
+            <Icon name="file" size={13} /> PDF
+          </button>
+          <button onClick={() => { if (window.confirm(t('deleteField', lang) + '?')) removeField(field.id); }}
+            className="flex items-center gap-1 text-xs font-medium text-ink/45 transition-colors hover:text-ink/75">
+            <Icon name="trash" size={13} /> {t('deleteField', lang)}
+          </button>
+        </div>
       </div>
 
-      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start lg:gap-6">
-      <div className="lg:contents">
-      {/* weather-aware rain advice */}
+      <div className="ornament mb-6 hidden lg:block" aria-hidden />
+
+      {/* weather-aware rain advice — spans the full width above the columns */}
       {s.inSeason && rainDay && (
         <div className="mb-3 flex items-start gap-3 rounded-2xl border border-water/30 bg-water/5 p-3.5">
           <Icon name="rain" size={22} className="shrink-0 text-water-deep" />
@@ -111,6 +131,11 @@ export function Dashboard({ field }: { field: FieldConfig }) {
         </div>
       )}
 
+      {/* Two real columns on desktop instead of grid placement tricks: the
+          reading order is the same one the phone has, so nothing moves. */}
+      <div className="lg:grid lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-start lg:gap-6">
+
+      <div>
       {/* signature gauge */}
       <section className="rounded-3xl border border-line bg-card px-5 pb-6 pt-7 text-center shadow-sm">
         <div className="flex items-center justify-center gap-2">
@@ -193,12 +218,37 @@ export function Dashboard({ field }: { field: FieldConfig }) {
         )}
       </section>
 
+      {/* watering history */}
+      <section className="mt-5 rounded-2xl border border-line bg-card p-4">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-medium uppercase tracking-wide text-ink/50">{t('history', lang)}</p>
+          <button onClick={() => openReport(field, lang)}
+            className="inline-flex items-center gap-1 lg:hidden rounded-full bg-water/10 px-3 py-1 text-xs font-medium text-water-deep">
+            <Icon name="file" size={13} /> PDF
+          </button>
+        </div>
+        {log.length ? (
+          <ul className="mt-3 flex flex-col gap-1.5">
+            {log.map((e, i) => (
+              <li key={i} className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-2">
+                  <Icon name={e.type === 'rain' ? 'rain' : 'drop'} size={15} className="text-water" />
+                  {e.type === 'rain' ? t('typeRain', lang) : t('typeWatered', lang)}
+                </span>
+                <span className="text-ink/50">{formatDate(new Date(e.date), lang)}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-2 text-sm text-ink/50">{t('noHistory', lang)}</p>
+        )}
+      </section>
       </div>
 
-      <div className="lg:col-start-2 lg:row-start-1 lg:row-span-2">
+      <div>
       {s.inSeason && (
         <>
-          <div className="ornament my-5 lg:mt-0" aria-hidden />
+          <div className="ornament my-5 lg:hidden" aria-hidden />
 
           {/* stage + interval */}
           <section className="grid grid-cols-2 gap-3">
@@ -232,32 +282,6 @@ export function Dashboard({ field }: { field: FieldConfig }) {
 
       {/* satellite field health */}
       <FieldNdvi field={field} />
-
-      {/* watering history */}
-      <section className="mt-5 rounded-2xl border border-line bg-card p-4">
-        <div className="flex items-center justify-between">
-          <p className="text-xs font-medium uppercase tracking-wide text-ink/50">{t('history', lang)}</p>
-          <button onClick={() => openReport(field, lang)}
-            className="inline-flex items-center gap-1 rounded-full bg-water/10 px-3 py-1 text-xs font-medium text-water-deep">
-            <Icon name="file" size={13} /> PDF
-          </button>
-        </div>
-        {log.length ? (
-          <ul className="mt-3 flex flex-col gap-1.5">
-            {log.map((e, i) => (
-              <li key={i} className="flex items-center justify-between text-sm">
-                <span className="flex items-center gap-2">
-                  <Icon name={e.type === 'rain' ? 'rain' : 'drop'} size={15} className="text-water" />
-                  {e.type === 'rain' ? t('typeRain', lang) : t('typeWatered', lang)}
-                </span>
-                <span className="text-ink/50">{formatDate(new Date(e.date), lang)}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="mt-2 text-sm text-ink/50">{t('noHistory', lang)}</p>
-        )}
-      </section>
 
       {/* Telegram reminders — connect, or disconnect once linked */}
       {syncEnabled && tgChecked && (

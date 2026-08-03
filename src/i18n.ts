@@ -39,6 +39,7 @@ export const dict: Dict = {
   todayNeed: { uz: 'Bugungi suv me’yori', ru: 'Норма воды на сегодня' },
   perDay: { uz: 'kuniga', ru: 'в день' },
   litersPerDay: { uz: 'litr / kun', ru: 'литров / день' },
+  litersShort: { uz: 'l', ru: 'л' },
   m3PerDay: { uz: 'm³ / kun', ru: 'м³ / день' },
   stageNow: { uz: 'Hozirgi bosqich', ru: 'Текущая фаза' },
   nextWatering: { uz: 'Keyingi sug‘orish', ru: 'Следующий полив' },
