@@ -11,11 +11,17 @@ const TOKEN_URL =
 const PROCESS_URL = 'https://sh.dataspace.copernicus.eu/api/v1/process';
 const STATS_URL = 'https://sh.dataspace.copernicus.eu/api/v1/statistics';
 
+import { rateLimit } from './_ratelimit.mjs';
+
 const cors = {
   'Access-Control-Allow-Origin': '*',
   'Content-Type': 'application/json',
-  'Cache-Control': 'public, max-age=86400', // a scene changes every ~5 days
 };
+
+// Only a real answer is worth keeping for a day. The long max-age used to sit
+// on every response, so a single failure — or one request made before the
+// credentials were configured — was cached as the answer for 24 hours.
+const cached = { ...cors, 'Cache-Control': 'public, max-age=86400' }; // a scene changes every ~5 days
 
 // Cache the bearer token in module scope across warm invocations.
 let tokenCache: { token: string; exp: number } | null = null;
@@ -99,7 +105,10 @@ async function clearBuckets(
     headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify(body),
   });
-  if (!res.ok) return null;
+  // An empty list, not null: the caller's type said Bucket[] either way, and a
+  // failed statistics call should degrade to "no reading yet" — the picture may
+  // still be available — rather than throw out of the handler as a 502.
+  if (!res.ok) return [];
   const j = (await res.json()) as { data?: any[] };
   const buckets: Bucket[] = [];
   let maxValid = 0;
@@ -141,6 +150,12 @@ async function ndviImage(token: string, bbox: number[], fromISO: string, toISO: 
 }
 
 export default async (req: Request): Promise<Response> => {
+  // Sentinel Hub bills processing units per call and this endpoint is public.
+  // Ten a minute is far above what one farmer's screen needs (the client also
+  // caches a scene for a day) and far below what a loop would cost.
+  const limited = rateLimit(req, { perMinute: 10, cors });
+  if (limited) return limited;
+
   const id = process.env.SH_CLIENT_ID;
   const secret = process.env.SH_CLIENT_SECRET;
   if (!id || !secret) {
@@ -184,7 +199,7 @@ export default async (req: Request): Promise<Response> => {
 
     return new Response(
       JSON.stringify({ ok: true, img, meanNdvi: mean, health, status, date: bucket?.date ?? null, history }),
-      { headers: cors },
+      { headers: cached },
     );
   } catch (e: any) {
     return new Response(JSON.stringify({ ok: false, error: String(e?.message || e) }), { status: 502, headers: cors });

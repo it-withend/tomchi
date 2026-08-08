@@ -6,12 +6,13 @@ as the Tomchi web app (`../src/engine`).
 ## What it does
 
 - `/start` — guided setup (language → region → crop → method → soil)
+- `/link <code>` — attach a field created in the app, so both sides show the same one
 - `/today` — today's water need, growth stage and interval
 - Daily push at **07:00 Asia/Tashkent** with the day's norm
 - Skips advice when Open-Meteo forecasts rain (≥5 mm) in the next 3 days
 - `/stop` — pause reminders, `/help` — commands
 
-## Run
+## Run locally
 
 ```bash
 cd bot
@@ -20,11 +21,17 @@ npm install
 npm start
 ```
 
-`.env` and `data/` (subscriber store) are gitignored — no secrets in the repo.
+That is long-polling, for development. **In production the same handlers run as
+a Netlify webhook function** (`netlify/functions/telegram.mts`) with the daily
+reminder as a scheduled function — see [../DEPLOY.md](../DEPLOY.md). Telegram
+delivers each update to one place only, so never run polling and the webhook at
+the same time.
+
+`.env` and `data/` (the local subscriber store) are gitignored. With Supabase
+configured, subscribers live there instead and the bot reads them with the
+service-role key.
 
 ## Notes
 
-- Reuses `../src/data` and `../src/engine/irrigation.ts` — single source of truth
-  with the web app. Run via `tsx`, no build step.
-- For production, host on any always-on Node process (Railway, Fly.io, a VPS)
-  and swap the JSON store for a database.
+Reuses `../src/data` and `../src/engine/irrigation.ts`, so the bot and the app
+cannot disagree about a norm. Run via `tsx`, no build step.

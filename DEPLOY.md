@@ -1,82 +1,63 @@
-# Deploy Tomchi (GitHub → Netlify) + bot on the cloud
+# Deploy
 
-## A. Put the code on GitHub
+The site and every serverless function live on one Netlify deployment. The
+Telegram bot runs there too, as a webhook plus a scheduled function — no
+always-on process to pay for.
 
-1. Create an empty repo at https://github.com/new — name it `tomchi`,
-   **do not** add a README/.gitignore (we already have them). Copy its URL.
-2. In the project folder (`E:\presidentTECH`), run:
+Read [SETUP.md](SETUP.md) first; it explains what each variable is and which
+feature it turns on.
 
-   ```bash
-   git remote add origin https://github.com/<YOUR_USER>/tomchi.git
-   git push -u origin main
-   ```
+## 1. The site
 
-   A browser window will ask you to sign in to GitHub — approve it.
+1. Push the repository to GitHub.
+2. https://app.netlify.com → **Add new site → Import an existing project** →
+   pick the repo. Build settings come from `netlify.toml`: `npm run build`,
+   publish `dist`, functions `netlify/functions`.
+3. **Site configuration → Environment variables** → add the client and server
+   variables from SETUP.md. Only the `VITE_*` ones reach the browser.
+4. **Deploys → Trigger deploy → Clear cache and deploy** so the variables apply.
+   Vite reads `VITE_*` at build time, so a redeploy is required — restarting is
+   not enough.
+5. In Supabase → **Authentication → URL Configuration**, add the deployed origin,
+   or anonymous sign-in will be refused from it.
 
-> Prefer I push it for you? Create a GitHub token
-> (https://github.com/settings/tokens → "Generate new token (classic)" → scope `repo`)
-> and send it with the repo URL. I'll push and you skip the commands.
+## 2. The Telegram bot
 
-## B. Deploy the site on Netlify
+The webhook **fails closed**: while `TELEGRAM_WEBHOOK_SECRET` is unset the
+function refuses every update, so set it before registering the webhook.
 
-1. https://app.netlify.com → **Add new site → Import an existing project → GitHub** →
-   pick the `tomchi` repo.
-2. Build settings are auto-detected from `netlify.toml` (build `npm run build`,
-   publish `dist`, functions `netlify/functions`). Just click **Deploy**.
-3. **Site configuration → Environment variables → Add** these:
+Register it once, substituting your own token, secret and site:
 
-   | Key | Value |
-   |-----|-------|
-   | `VITE_SUPABASE_URL` | `https://cgihysaztskxufwvtgja.supabase.co` |
-   | `VITE_SUPABASE_ANON_KEY` | `sb_publishable_0xa_tK-K5Td75R3mWd1s6Q_SeQ_Y1qa` |
-   | `AI_API_KEY` | *(your Groq key, starts with `gsk_`)* |
+```bash
+curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://<YOUR_SITE>.netlify.app/.netlify/functions/telegram&secret_token=<SECRET>&drop_pending_updates=true"
+```
 
-   Optional (defaults already work): `AI_MODEL`, `AI_VISION_MODEL`, `AI_BASE_URL`.
-4. **Deploys → Trigger deploy → Clear cache and deploy** so the env vars apply.
+A `{"ok":true}` reply means the bot answers from then on, and the 07:00
+Asia/Tashkent reminder fires from `tomchi-daily` (cron `0 2 * * *` UTC).
 
-Your public URL will be `https://<name>.netlify.app`. The AI doctor (text + photo)
-runs on `/.netlify/functions/*` with the Groq key server-side.
+Setting a webhook disables long-polling. To go back to local polling, call
+`deleteWebhook` first, and never run both.
 
-### Add the site to Supabase allowed origins
-Supabase → Authentication → URL Configuration → add your `https://<name>.netlify.app`
-to **Site URL / Redirect URLs** (so anonymous auth works from the deployed site).
+## 3. Scheduled functions
 
-## C. Run the Telegram bot on Netlify (free, no separate host)
+Two run on a timer and need nothing beyond their environment variables:
 
-The bot runs as a **webhook function** + a **scheduled function** on the same
-Netlify site — no always-on server, no Railway, no extra account.
+| Function | Schedule | What it does |
+|---|---|---|
+| `tomchi-daily` | `0 2 * * *` UTC | The 07:00 Tashkent irrigation reminder |
+| `irrigation-tick` | every 5 min | Closes finished irrigation sessions, writes the journal entry, notifies Telegram |
 
-1. **Run the DB migration.** Supabase → **SQL Editor** → paste the contents of
-   `supabase/migrations/0002_bot_subscribers.sql` → **Run**. (Adds the
-   `bot_subscribers` table used when a farmer sets up a field inside the bot.)
-2. **Add bot env vars** in Netlify → Site configuration → Environment variables:
+After the first deploy, check both appear under **Functions** in the Netlify
+dashboard. A scheduled function that never registered simply never runs, and
+nothing in the app will say so.
 
-   | Key | Value |
-   |-----|-------|
-   | `TELEGRAM_BOT_TOKEN` | *(your BotFather token)* |
-   | `SUPABASE_URL` | `https://cgihysaztskxufwvtgja.supabase.co` |
-   | `SUPABASE_SERVICE_ROLE_KEY` | *(your Supabase `sb_secret_…` key)* |
-   | `TELEGRAM_WEBHOOK_SECRET` | *(any long random string)* |
+## Rotating keys
 
-   `SUPABASE_SERVICE_ROLE_KEY` and `TELEGRAM_BOT_TOKEN` are server-side only —
-   they run in functions and are never shipped to the browser (only `VITE_*`
-   vars are). Do **not** prefix them with `VITE_`.
-3. **Deploys → Trigger deploy → Clear cache and deploy site** so the vars apply.
-4. **Register the webhook** (one time). Replace `<TOKEN>` and `<SECRET>`:
+Anything that has ever been pasted into a chat, a screenshot or a demo should be
+rotated: Supabase (Settings → API), Groq (delete and recreate), BotFather
+(`/revoke`), and the Copernicus OAuth client. Update the Netlify variables
+afterwards and redeploy.
 
-   ```bash
-   curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://tomchiai.netlify.app/.netlify/functions/telegram&secret_token=<SECRET>&drop_pending_updates=true"
-   ```
-
-   You should get `{"ok":true,"result":true,...}`. The bot now replies instantly,
-   and the 07:00 Asia/Tashkent reminder fires from the scheduled function
-   (`tomchi-daily`, cron `0 2 * * *` UTC).
-
-> To go back to local testing later: `cd bot && npm start` (long-polling). Note
-> that setting a webhook disables polling — run `deleteWebhook` first, and never
-> run both at once (Telegram delivers updates to only one).
-
-## Security reminder
-Rotate the keys you shared in chat once everything works:
-Supabase (Settings → API → rotate), Groq (delete/recreate key), BotFather (`/revoke`),
-and the GitHub token. Update them in Netlify env vars afterwards.
+The publishable Supabase key and project URL are compiled into the browser
+bundle and cannot be hidden — that is expected. Row-level security is what keeps
+each farmer's rows private, so treat RLS policies, not that key, as the boundary.

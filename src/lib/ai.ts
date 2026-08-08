@@ -24,14 +24,6 @@ async function callFn(fn: string, body: unknown, lang: Lang): Promise<string> {
   return json.answer as string;
 }
 
-export function diagnoseText(cropId: string, symptoms: string, lang: Lang): Promise<string> {
-  return callFn('diagnose', { cropId, symptoms, lang }, lang);
-}
-
-export function diagnosePhoto(cropId: string, imageBase64: string, lang: Lang): Promise<string> {
-  return callFn('diagnose-photo', { cropId, image: imageBase64, lang }, lang);
-}
-
 /** Voice → text: sends a recorded audio clip to Whisper, returns the transcript. */
 export async function transcribe(audio: Blob, lang: Lang): Promise<string> {
   const res = await fetch(`${base}/transcribe?lang=${lang}`, {

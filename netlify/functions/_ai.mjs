@@ -14,21 +14,9 @@ const CROP_NAMES = {
   potato: 'kartoshka / картофель / potato',
 };
 
-export function systemPrompt(cropId, lang) {
-  const crop = CROP_NAMES[cropId] || cropId || 'a crop';
-  const language = lang === 'ru' ? 'Russian' : 'Uzbek (Latin script)';
-  return `You are an experienced agronomist advising farmers in Uzbekistan (Central Asian climate, irrigated agriculture).
-The farmer grows: ${crop}.
-Answer ONLY in ${language}. Be concrete and practical for a smallholder farmer.
-Structure your answer with short labeled sections:
-1) Likely problem (disease/pest/deficiency)
-2) What to do now — numbered steps, name affordable treatments available in Uzbekistan
-3) Prevention
-Keep it under 180 words. If a photo is unclear or symptoms are ambiguous, say what extra detail is needed. Do not invent certainty; add a short note to confirm with a local agronomist.`;
-}
-
-// Conversational agronomist for the ongoing chat (follow-up questions, not a
-// one-shot disease form). Stays practical and short; answers in the farmer's language.
+// The agronomist behind the chat tab. Photos and follow-up questions go through
+// the same conversation, so there is one prompt rather than a separate one-shot
+// disease form.
 export function chatSystemPrompt(cropId, lang) {
   const crop = CROP_NAMES[cropId] || cropId || 'a crop';
   const language = lang === 'ru' ? 'Russian' : 'Uzbek (Latin script)';

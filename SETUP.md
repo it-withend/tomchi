@@ -1,66 +1,92 @@
-# Tomchi — backend setup (Supabase + AI + Telegram)
+# Setup
 
-The web app works with **zero setup** on localStorage. Follow this to turn on
-the connected features: app ↔ bot sync, and the AI plant doctor.
+The app runs with **no configuration at all**: irrigation norms, the soil-water
+balance, the calendar and the savings screen are computed on the device and
+stored in `localStorage`.
 
-Everything below uses **free tiers** (Supabase + Groq).
+```bash
+npm install
+npm run dev
+```
+
+Everything below is optional and turns on one connected feature each. All of it
+fits in free tiers.
+
+| You want | You need |
+|---|---|
+| Sync between devices, Telegram link, remote irrigation | Supabase |
+| AI agronomist: chat, photo diagnosis, voice input | Groq API key |
+| Field health from space (NDVI) | Copernicus Data Space OAuth client |
+| The Telegram bot itself | BotFather token |
+
+Serverless functions do not run under `npm run dev`; calls to
+`/.netlify/functions/*` will 404. To exercise them locally use `npx netlify dev`
+instead, with the server variables below in a root `.env`.
 
 ---
 
-## 1. Create a Supabase project (5 min)
+## Supabase
 
-1. Go to https://supabase.com → **New project** (free plan). Pick a region close to Uzbekistan (e.g. Frankfurt).
-2. When it's ready, open **SQL Editor** → paste the contents of
-   [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql) → **Run**.
-3. Enable anonymous logins: **Authentication → Providers → Anonymous → Enable**.
-4. Copy from **Settings → API**:
-   - `Project URL`
-   - `anon public` key  → for the web app (public, safe)
-   - `service_role` key → for the bot only (secret)
+1. Create a project at https://supabase.com (free plan; a region near Uzbekistan,
+   e.g. Frankfurt).
+2. **SQL Editor** → run every file in [`supabase/migrations/`](supabase/migrations/)
+   in order, `0001` through `0004`. They create the field tables and their
+   row-level-security policies, the bot's subscriber and link tables, and the
+   devices and irrigation-session tables. Skipping any of them leaves a feature
+   silently broken.
+3. **Authentication → Providers → Anonymous → Enable.** The app never asks for a
+   password; each device gets an anonymous identity and RLS ties every row to it.
+4. **Authentication → URL Configuration** → add the origin you serve the app from.
 
-## 2. Wire the web app
+Copy from **Settings → API**: the project URL, the publishable (`anon`) key, and
+the secret (`service_role`) key.
 
-Create `.env` in the project root (copy from `.env.example`):
+## Environment variables
 
-```
-VITE_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
-VITE_SUPABASE_ANON_KEY=your_anon_public_key
-```
+Client — these are compiled into the browser bundle, so they are public by
+design. Row-level security is what protects the data, not their secrecy.
 
-Rebuild / redeploy. A **"Connect Telegram"** card now appears on the dashboard,
-and the AI tab in **Diagnosis** becomes active.
+| Variable | Purpose |
+|---|---|
+| `VITE_SUPABASE_URL` | Supabase project URL |
+| `VITE_SUPABASE_ANON_KEY` | Supabase publishable key |
+| `VITE_AI_URL` | Optional. Override the functions base if you host them elsewhere. |
 
-## 3. Get a free AI key (Groq) and deploy the functions
+Server — read only inside functions and the bot. **Never** prefix these with
+`VITE_`; that would publish them.
 
-1. Sign up at https://console.groq.com → **API Keys** → create a key (free).
-2. Install the Supabase CLI and log in: `npm i -g supabase` → `supabase login`.
-3. Link and set secrets (from the project root):
+| Variable | Purpose |
+|---|---|
+| `AI_API_KEY` | Groq key from https://console.groq.com |
+| `SUPABASE_URL` | Same project URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase secret key; bypasses RLS |
+| `SH_CLIENT_ID`, `SH_CLIENT_SECRET` | Copernicus Data Space OAuth client, for NDVI |
+| `TELEGRAM_BOT_TOKEN` | BotFather token |
+| `TELEGRAM_WEBHOOK_SECRET` | Any long random string. The webhook refuses every update while this is unset. |
+| `TOMCHI_SITE_URL` | Optional. The address the bot links back to. |
 
-   ```bash
-   supabase link --project-ref YOUR_PROJECT_REF
-   supabase secrets set AI_API_KEY=gsk_your_groq_key
-   # optional overrides (defaults shown):
-   # supabase secrets set AI_BASE_URL=https://api.groq.com/openai/v1
-   # supabase secrets set AI_MODEL=llama-3.3-70b-versatile
-   # supabase secrets set AI_VISION_MODEL=meta-llama/llama-4-scout-17b-16e-instruct
-   supabase functions deploy diagnose
-   supabase functions deploy diagnose-photo
-   ```
+Model ids drift; override them if a call starts failing: `AI_MODEL`,
+`AI_VISION_MODEL`, `AI_WHISPER_MODEL`, `AI_BASE_URL`. `AI_BASE_URL` is
+OpenAI-compatible, so another provider works by changing these four alone.
 
-   > Model IDs change over time — if a call fails, pick a current text/vision model
-   > from the Groq docs and update `AI_MODEL` / `AI_VISION_MODEL`.
-   > To switch provider entirely (OpenAI, Gemini via OpenAI-compat), just change
-   > `AI_BASE_URL`, `AI_MODEL`, and `AI_API_KEY`.
+Copy `.env.example` to `.env` for the client variables, and `bot/.env.example`
+to `bot/.env` if you run the bot locally. Neither `.env` is ever committed.
 
-## 4. Run the bot linked to the backend
+## Field health from space
 
-In `bot/.env` (copy from `bot/.env.example`):
+Register an OAuth client at the
+[Copernicus Data Space Ecosystem](https://dataspace.copernicus.eu) dashboard
+(User Settings → OAuth clients) and set `SH_CLIENT_ID` / `SH_CLIENT_SECRET`.
+Sentinel-2 imagery is free; the processing quota is metered, which is why the
+function is rate-limited and the client caches a scene for a day.
 
-```
-TELEGRAM_BOT_TOKEN=your_botfather_token
-SUPABASE_URL=https://YOUR_PROJECT.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-```
+Without these the satellite card says the data is unavailable and the rest of
+the app is unaffected.
+
+## Telegram bot
+
+For production the bot runs as a webhook function on the same deployment — see
+[DEPLOY.md](DEPLOY.md). For local work it can long-poll instead:
 
 ```bash
 cd bot
@@ -68,17 +94,15 @@ npm install
 npm start
 ```
 
-## 5. Try the full loop
+Never run polling and a webhook at the same time; Telegram delivers each update
+to only one of them.
 
-1. In the app: create a field → tap **Connect Telegram** → copy the `/link 123456` code.
-2. In Telegram: open **@tomchiaibot** → send `/link 123456`.
-3. Send `/today` — the bot answers using the field you set up in the app.
-   Every day at 07:00 (Asia/Tashkent) it sends the reminder automatically.
+To check the loop end to end: create a field in the app, tap **Connect
+Telegram**, and send the `/link` code it shows to the bot. `/today` should then
+answer with that field, and the daily reminder goes out at 07:00 Asia/Tashkent.
 
 ---
 
-### Security notes
-- `anon` key is public by design (safe in the web bundle); Row Level Security keeps
-  each device's data private (anonymous auth `owner = auth.uid()`).
-- `service_role` key and the bot token live **only** in `bot/.env` / Supabase secrets
-  — never in the web app or git.
+Deployment lives in [DEPLOY.md](DEPLOY.md). The design decisions behind the
+irrigation control are in
+[docs/superpowers/specs](docs/superpowers/specs/2026-07-27-remote-irrigation-design.md).
