@@ -7,7 +7,7 @@ import { useForecast } from '../useForecast';
 import { dayFrom, DANGEROUS_HEAT_C } from '../engine/weather';
 import {
   getDevice, getActiveSession, startIrrigation, stopIrrigation, listSessions,
-  updateFlow, progressOf, plannedMinutes, exceedsSessionLimit, litersForDeficit,
+  updateFlow, disconnectDevice, progressOf, plannedMinutes, exceedsSessionLimit, litersForDeficit,
   MAX_SESSION_MINUTES, type Device, type Session, type SessionProgress,
 } from '../lib/devices';
 import { MoistureGauge } from './MoistureGauge';
@@ -101,6 +101,19 @@ export function ControlPanel({ field }: { field: FieldConfig }) {
     void refresh();
   };
 
+  // Deleting the device cascades to its sessions, so this is offered only when
+  // nothing is running — otherwise a live irrigation would vanish from the app
+  // while the valve, in a real installation, stayed open.
+  const forget = async () => {
+    if (!window.confirm(t('unlinkDeviceConfirm', lang))) return;
+    setBusy(true);
+    await disconnectDevice(field.id);
+    setBusy(false);
+    setDevice(null);
+    setActive(null);
+    setHistory([]);
+  };
+
   const saveFlow = async () => {
     const value = Math.round(Number(flowDraft.replace(',', '.')));
     if (!Number.isFinite(value) || value <= 0) { setEditingFlow(false); return; }
@@ -113,9 +126,17 @@ export function ControlPanel({ field }: { field: FieldConfig }) {
     <div className="px-5 pb-28 pt-6 lg:max-w-2xl lg:pb-10 lg:pl-0 lg:pr-1 lg:pt-8">
       <div className="flex items-center justify-between">
         <h2 className="font-display text-lg font-medium text-ink">{t('tabControl', lang)}</h2>
-        <span className="flex items-center gap-1.5 rounded-full bg-sky px-2.5 py-1 text-[10px] font-medium text-indigo">
-          <Icon name="tap" size={12} /> {t('virtualDevice', lang)}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="flex items-center gap-1.5 rounded-full bg-sky px-2.5 py-1 text-[10px] font-medium text-indigo">
+            <Icon name="tap" size={12} /> {t('virtualDevice', lang)}
+          </span>
+          {!active && (
+            <button onClick={forget} disabled={busy}
+              className="flex items-center gap-1.5 rounded-full border border-line px-2.5 py-1 text-[10px] font-medium text-ink/60 transition-colors hover:border-ink/30 hover:text-ink disabled:opacity-50">
+              <Icon name="unlink" size={12} /> {t('unlinkDevice', lang)}
+            </button>
+          )}
+        </div>
       </div>
 
       {dangerousHeat && (

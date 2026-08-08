@@ -304,6 +304,11 @@ export const dict: Dict = {
     ru: 'Устройство не подключилось. Проверьте интернет или попробуйте позже.',
   },
   virtualDevice: { uz: 'Virtual qurilma', ru: 'Виртуальное устройство' },
+  unlinkDevice: { uz: 'Uzish', ru: 'Отключить' },
+  unlinkDeviceConfirm: {
+    uz: 'Qurilma uzilsinmi? Sug‘orish tarixi ham o‘chadi. Istalgan vaqtda qayta ulashingiz mumkin.',
+    ru: 'Отключить устройство? История сеансов полива тоже удалится. Подключить снова можно в любой момент.',
+  },
   flowLabel: { uz: 'Suv sarfi', ru: 'Расход воды' },
   flowEditable: { uz: 'keyin o‘zgartirsa bo‘ladi', ru: 'можно изменить позже' },
   lpm: { uz: 'l/daq', ru: 'л/мин' },
